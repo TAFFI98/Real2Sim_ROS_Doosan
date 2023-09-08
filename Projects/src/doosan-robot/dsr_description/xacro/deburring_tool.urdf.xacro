@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<robot name="deburring_tool" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+ 	<xacro:macro name="deburring_tool" >
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"> 
+      <robotNamespace>/</robotNamespace>
+    </plugin> 
+  </gazebo>
+	<link name="tool">
+			<inertial>
+				<mass value="0.03"/>
+				<origin rpy="3.14 0 0" xyz="0 0 0" />
+				<inertia ixx="1.76151887e-07" ixy="-3.61499054e-12" ixz="-6.69977864e-11" iyy="1.76154141e-07"
+					iyz="-6.88153918e-11"
+					izz="2.91585994e-08"/>
+			</inertial>
+		
+      <collision>
+            		<max_contacts>5</max_contacts> 
+        <geometry>
+					<mesh filename="package://dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl" scale="1 1 1 " />
+				
+        </geometry>
+      </collision>
+	  <visual>
+				<origin rpy="3.14 0 0" xyz="0 0 0" />
+				<geometry>
+					<mesh filename="package://dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl" scale="1 1 1" />
+				</geometry>
+    </visual>
+	
+	</link>
+
+
+	<joint name="joint7" type="revolute">
+			<parent link="link6" />
+			<child link="tool" />
+			<origin rpy="0 0 0" xyz="0 0 0" />
+			<axis xyz="0 0 1" />
+			<limit effort="0" lower="0" upper="0" velocity="0"/>
+			<dynamics damping = "60.0" friction="4.0" />
+	</joint>
+
+		<link name="tcp">
+			<inertial>
+				<mass value="0.0001"/>
+				<origin rpy="0  0 0" xyz="0 0 0" />
+				<inertia ixx="0" ixy="0" ixz="0" iyy="0"
+					iyz="0"
+					izz="0"/>
+			</inertial>
+		
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<sphere radius="0.0015"/>
+			</geometry>
+			<material name="green">
+				<color rgba="0 1 0 1" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="2.96  0 0" xyz="0 0 0" />
+			<geometry>
+				<sphere radius="0.0015"/>
+			</geometry>
+		</collision>
+	
+	</link>
+
+
+	<joint name="joint8" type="revolute">
+			<parent link="link6" />
+			<child link="tcp" />
+			<origin rpy="-0.17 0 0" xyz="-0.00966 0.00772  0.166" />
+			<axis xyz="0 0 1" />
+			<limit effort="0" lower="0" upper="0" velocity="0"/>
+			<dynamics damping = "60.0" friction="4.0" />
+	</joint>
+
+
+	</xacro:macro>
+</robot>
+
+
+
+		

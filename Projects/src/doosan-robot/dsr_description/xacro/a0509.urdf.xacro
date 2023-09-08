@@ -20,7 +20,10 @@
   <xacro:if value="${gr == 'robotiq_2f'}">
      <xacro:include filename="$(find dsr_description)/xacro/robotiq_2f.urdf.xacro" />
   </xacro:if>
-
+  <xacro:if value="${gr == 'deburring_tool'}">
+     <xacro:include filename="$(find dsr_description)/xacro/deburring_tool.urdf.xacro" />
+     <xacro:deburring_tool/>
+  </xacro:if>
   <!-- World fixed joint-->
   <joint name="world_fixed" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0"/>

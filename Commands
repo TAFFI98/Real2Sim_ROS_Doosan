@@ -1,0 +1,29 @@
+
+
+INSTALL AND SOURCE THE WORKSPACE
+cd ~/catkin_ws
+catkin_make
+source ./devel/setup.bash
+
+
+LAUNCH GAZEBO AND RVIZ
+cd ~/catkin_ws
+source ./devel/setup.bash
+
+# DESCRIPTION IN RVIZ
+roslaunch dsr_description a0509.launch color:=blue gripper:=deburring_tool 
+
+# GAZEBO
+roslaunch dsr_launcher single_robot_gazebo.launch model:=a0509 color:=blue gripper:=deburring_tool 
+
+
+
+
+# GAZEBO + moveit
+roslaunch dsr_launcher dsr_moveit_gazebo.launch model:=a0509  color:=blue gripper:=deburring_tool mode:=virtual
+
+# REAL ROBOT
+roslaunch dsr_launcher dsr_moveit_gazebo.launch model:=a0509  color:=blue  mode:=real host:=192.168.127.100 port:=12345
+
+
+roslaunch dsr_launcher dsr_moveit.launch model:=a0509 color:=blue gripper:=robotiq_2f mode:=virtual
