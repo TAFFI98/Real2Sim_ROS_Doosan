@@ -25,8 +25,8 @@ RUN set -x \
 
 
 
-COPY ./Projects/src ~/catkin_ws/src
-WORKDIR ~/catkin_ws/src
+COPY ./Projects/src /root/catkin_ws/src
+WORKDIR /root/catkin_ws/src
 RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro melodic -r -y
 
 
