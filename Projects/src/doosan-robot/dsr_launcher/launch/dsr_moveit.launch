@@ -58,12 +58,22 @@
       </include>
   </group>
 
-  <group if="$(eval arg('model') == 'a0509')">
+  <group if="$(eval arg('model') == 'a0509' and arg('gripper') != 'deburring_tool')">
       <include file="$(find moveit_config_a0509)/launch/a0509.launch" ns="dsr01$(arg model)">
           <arg name="fake_execution" value="false"/>
           <arg name="color" value="$(arg color)"/>
       </include>
   </group>
+
+
+  <group if="$(eval arg('model') == 'a0509' and arg('gripper') == 'deburring_tool')">
+      <include file="$(find moveit_config_a0509_deburring)/launch/a0509.launch" ns="dsr01$(arg model)">
+          <arg name="fake_execution" value="false"/>
+          <arg name="color" value="$(arg color)"/>
+          <arg name="gripper" value="$(arg gripper)"/>
+      </include>
+  </group>
+
 
   <group if="$(eval arg('model') == 'a0912')">
       <include file="$(find moveit_config_a0912)/launch/a0912.launch" ns="dsr01$(arg model)">

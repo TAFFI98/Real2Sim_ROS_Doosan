@@ -780,6 +780,11 @@ namespace dsr_control{
             arm_joint_names =
             boost::assign::list_of("joint1")("joint2")("joint3")("joint4")("joint5")("joint6").convert_to_container<ros::V_string>();
         }
+        else if(m_strRobotGripper == "deburring_tool")
+        {
+            arm_joint_names =
+            boost::assign::list_of("joint1")("joint2")("joint3")("joint4")("joint5")("joint6").convert_to_container<ros::V_string>();
+        }
         for(unsigned int i = 0; i < arm_joint_names.size(); i++){
             hardware_interface::JointStateHandle jnt_state_handle(
                 arm_joint_names[i],
@@ -1124,7 +1129,7 @@ namespace dsr_control{
             joints[i].pos = deg2rad(pose->_fPosition[i]);	//update pos to Rviz
             msg.data.push_back(joints[i].pos);
         }
-        if(m_strRobotGripper != "none"){
+        if(m_strRobotGripper != "none" and m_strRobotGripper != "deburring_tool" ){
             msg.data.push_back(joints[6].pos);
         }
         m_PubtoGazebo.publish(msg);

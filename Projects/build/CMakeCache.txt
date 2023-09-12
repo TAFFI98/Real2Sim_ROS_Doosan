@@ -931,6 +931,12 @@ moveit_config_a0509_BINARY_DIR:STATIC=/root/catkin_ws/build/doosan-robot/moveit_
 moveit_config_a0509_SOURCE_DIR:STATIC=/root/catkin_ws/src/doosan-robot/moveit_config_a0509
 
 //Value Computed by CMake
+moveit_config_a0509_deburring_BINARY_DIR:STATIC=/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring
+
+//Value Computed by CMake
+moveit_config_a0509_deburring_SOURCE_DIR:STATIC=/root/catkin_ws/src/doosan-robot/moveit_config_a0509_deburring
+
+//Value Computed by CMake
 moveit_config_a0912_BINARY_DIR:STATIC=/root/catkin_ws/build/doosan-robot/moveit_config_a0912
 
 //Value Computed by CMake
@@ -1371,7 +1377,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=21
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=22
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

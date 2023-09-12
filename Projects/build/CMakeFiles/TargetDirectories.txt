@@ -57,6 +57,13 @@
 /root/catkin_ws/build/doosan-robot/moveit_config_a0509/CMakeFiles/install/local.dir
 /root/catkin_ws/build/doosan-robot/moveit_config_a0509/CMakeFiles/rebuild_cache.dir
 /root/catkin_ws/build/doosan-robot/moveit_config_a0509/CMakeFiles/install.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/install/strip.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/edit_cache.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/list_install_components.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/test.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/install/local.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/rebuild_cache.dir
+/root/catkin_ws/build/doosan-robot/moveit_config_a0509_deburring/CMakeFiles/install.dir
 /root/catkin_ws/build/doosan-robot/moveit_config_a0912/CMakeFiles/install/strip.dir
 /root/catkin_ws/build/doosan-robot/moveit_config_a0912/CMakeFiles/edit_cache.dir
 /root/catkin_ws/build/doosan-robot/moveit_config_a0912/CMakeFiles/list_install_components.dir

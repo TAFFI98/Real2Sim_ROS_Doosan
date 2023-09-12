@@ -491,6 +491,24 @@ doosan-robot/moveit_config_a0509/preinstall:
 .PHONY : doosan-robot/moveit_config_a0509/preinstall
 
 #=============================================================================
+# Directory level rules for directory doosan-robot/moveit_config_a0509_deburring
+
+# Convenience name for "all" pass in the directory.
+doosan-robot/moveit_config_a0509_deburring/all:
+
+.PHONY : doosan-robot/moveit_config_a0509_deburring/all
+
+# Convenience name for "clean" pass in the directory.
+doosan-robot/moveit_config_a0509_deburring/clean:
+
+.PHONY : doosan-robot/moveit_config_a0509_deburring/clean
+
+# Convenience name for "preinstall" pass in the directory.
+doosan-robot/moveit_config_a0509_deburring/preinstall:
+
+.PHONY : doosan-robot/moveit_config_a0509_deburring/preinstall
+
+#=============================================================================
 # Directory level rules for directory doosan-robot/moveit_config_a0912
 
 # Convenience name for "all" pass in the directory.
