@@ -1,0 +1,3 @@
+[submodule "Projects/src/realsense-ros-gazebo"]
+	path = Projects/src/realsense-ros-gazebo
+	url = https://github.com/rickstaa/realsense-ros-gazebo.git
