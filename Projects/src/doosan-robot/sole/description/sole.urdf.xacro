@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="sole" > 
+
+<!-- sole -->
+<link name="world" />
+<joint name="world_joint"  type="fixed">
+    <origin xyz="0.06 0.7 0.01" rpy="0 0 0" />
+    <parent link="world"/>
+    <child link="sole_link"/>
+</joint>
+
+<link name="sole_link">
+		<inertial>
+			<mass value="0.3"/>
+			<origin rpy="1.57 -3.14 0 " xyz="0 0 0" />
+			<inertia ixx="0" ixy="0" ixz="0" iyy="0"
+				iyz="0"
+				izz="0"/>
+		</inertial>
+		<collision>
+						<max_contacts>5</max_contacts> 
+			<geometry>
+						<mesh filename="package://sole/meshes/sole.stl" scale="1 1 1" />	
+			</geometry>
+		</collision>
+		<visual>
+			            <origin rpy="1.57 -3.14 0 " xyz="0 0 0 " />
+			<geometry>
+						<mesh filename="package://sole/meshes/sole.stl" scale="1 1 1" />
+			</geometry>
+		</visual>
+	</link>
+  <gazebo reference="sole_link">
+    <material>Gazebo/Black</material>
+  </gazebo>	
+
+
+</robot>
+
+
