@@ -41,9 +41,3 @@ roslaunch dsr_launcher single_robot_rviz_gazebo_sole.launch model:=a0509  color:
 
 
 
-
-mkdir ~/catkin_ws
-cd ~/catkin_ws
-git clone --recurse-submodules https://github.com/rickstaa/realsense-ros-gazebo.git src
-rosdep install --from-paths src --ignore-src --rosdistro melodic
-roslaunch realsense2_description view_d435_model_rviz_gazebo.launch

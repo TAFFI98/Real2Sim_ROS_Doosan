@@ -49,11 +49,7 @@
   <group if="$(arg camera)">
     <include file="$(find realsense2_description)/launch/view_d435i_model_rviz_gazebo.launch">    </include>
     <node name="dmodel" pkg="dsr_launcher" type="dmodel_camera.py"/>  
-
   </group>
-
-
-
 
   <!-- wold, map and dsr01/world are coincident reference frames -->
   <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 world map 100" />
