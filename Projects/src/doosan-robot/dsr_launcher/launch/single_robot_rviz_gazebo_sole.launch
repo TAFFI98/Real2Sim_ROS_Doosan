@@ -11,9 +11,9 @@
   <arg name="color" default="white"/>
   <arg name="gripper" default="none"/>
   <arg name="mobile" default="none"/>
-  <arg name="sole" default="true"/>
+  <arg name="sole" default="true"/>  
   <arg name="camera" default="true"/>
-
+  <arg name="sole_n" default="1"/> 
 
   <!-- Start Gazebo with an empty world. -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -42,7 +42,81 @@
 
   <!-- Spawn the sole -->
   <group if="$(arg sole)">
-    <include file="$(find sole)/launch/sole.launch">    </include>
+    <group if="$(eval arg('sole_n') == 1)">
+      <include file="$(find sole)/launch/sole_1.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 2)">
+      <include file="$(find sole)/launch/sole_2.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 3)">
+      <include file="$(find sole)/launch/sole_3.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 4)">
+      <include file="$(find sole)/launch/sole_4.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 5)">
+      <include file="$(find sole)/launch/sole_5.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 6)">
+      <include file="$(find sole)/launch/sole_6.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 7)">
+      <include file="$(find sole)/launch/sole_7.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 8)">
+      <include file="$(find sole)/launch/sole_8.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 9)">
+      <include file="$(find sole)/launch/sole_9.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 10)">
+      <include file="$(find sole)/launch/sole_10.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 11)">
+      <include file="$(find sole)/launch/sole_11.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 12)">
+      <include file="$(find sole)/launch/sole_12.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 13)">
+      <include file="$(find sole)/launch/sole_13.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 14)">
+      <include file="$(find sole)/launch/sole_14.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 15)">
+      <include file="$(find sole)/launch/sole_15.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 16)">
+      <include file="$(find sole)/launch/sole_16.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 17)">
+      <include file="$(find sole)/launch/sole_17.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 18)">
+      <include file="$(find sole)/launch/sole_18.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 19)">
+      <include file="$(find sole)/launch/sole_19.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 20)">
+      <include file="$(find sole)/launch/sole_20.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 21)">
+      <include file="$(find sole)/launch/sole_21.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 22)">
+      <include file="$(find sole)/launch/sole_22.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 23)">
+      <include file="$(find sole)/launch/sole_23.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 24)">
+      <include file="$(find sole)/launch/sole_24.launch">    </include>
+    </group>
+    <group if="$(eval arg('sole_n') == 25)">
+      <include file="$(find sole)/launch/sole_25.launch">    </include>
+    </group>
   </group>
 
   <!-- Spawn the camera -->
