@@ -20,7 +20,7 @@ ENV PYTHONUNBUFFERED 1
 RUN set -x \
         && apt-get update \
         && apt-get upgrade -y \
-        && apt-get install -y  terminator python3-catkin-tools \
+        && apt-get install -y  terminator wget python3-catkin-tools \
 	&& apt install snapd -y
 
 
@@ -30,7 +30,20 @@ WORKDIR /root/catkin_ws/src
 RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro melodic -r -y
 WORKDIR /root/catkin_ws/
 RUN rosdep install --from-paths src --ignore-src --rosdistro melodic
+RUN sudo apt install python-pip -y
+RUN pip install pyquaternion pathlib
 # add environment setup 
 RUN echo 'source /opt/ros/melodic/setup.bash' >> /root/.bashrc
+ 
+ENV MINICONDA_VERSION latest
+ENV CONDA_DIR $HOME/miniconda3
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
+    chmod +x ~/miniconda.sh && \
+    sudo ~/miniconda.sh -b -p $CONDA_DIR && \
+    sudo rm ~/miniconda.sh
+    
+    
 
+# make conda activate command available from /bin/bash --login shells
+RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 

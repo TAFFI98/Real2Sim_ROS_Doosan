@@ -37,7 +37,18 @@ MOVEIT SETUP ASSISTANT
 roslaunch moveit_setup_assistant setup_assistant.launch
 
 # RVIZ GAZEBO WITH SOLE
-roslaunch dsr_launcher single_robot_rviz_gazebo_sole.launch model:=a0509  color:=blue gripper:=deburring_tool mode:=virtual sole:=true
+roslaunch dsr_launcher single_robot_rviz_gazebo_sole.launch model:=a0509  color:=blue gripper:=deburring_tool mode:=virtual sole:=true sole_n:=10
 
+# DATASET GENERATION
+rosrun learn_to_see run_learn_to_see.py
 
+#Transformation from color camera to world frame
+rosrun tf tf_echo world camera_color_frame 
 
+- Translation: [-0.032, 0.513, 0.489]
+- Rotation: in Quaternion [-0.500, 0.500, 0.500, 0.500]
+            in RPY (radian) [0.000, 1.570, 1.570]
+            in RPY (degree) [0.000, 89.954, 89.954]
+            
+            
+conda env create -f /root/catkin_ws/learn_to_see_mapping/environment.yml

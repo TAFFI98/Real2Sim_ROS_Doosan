@@ -31,7 +31,7 @@ class LearnToSeeNode():
 			self.sole_ori_z = self.sole_coordinates.link_state.pose.orientation.z
 			self.sole_ori_w = self.sole_coordinates.link_state.pose.orientation.w
 			
-			# -------------------- Client to reset the  sole position ------------------#
+			# -------------------- Client to reset the sole position ------------------#
 			self.set_model_coordinates = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)			
 			
 			
@@ -48,6 +48,7 @@ class LearnToSeeNode():
 			image_height, image_width, _ = self.cv_image.shape
 
 		def image_show(self):
+			# -------------------- Show image------------------#
 			cv2.namedWindow('Camera Image')
 			cv2.imshow("Camera Image",self.cv_image)
 			cv2.waitKey(1)
@@ -81,9 +82,9 @@ class LearnToSeeNode():
 				state.link_name = "sole::sole_link"
 				state.reference_frame = 'world'  
 
-				# new sole position 
-				random_soles_position_x = random.uniform( -0.27, 0.24) 
-				random_soles_position_y = random.uniform( 0.38, 0.53) 
+				# New sole position 
+				random_soles_position_x = random.uniform( -0.20, 0.12) 
+				random_soles_position_y = random.uniform( 0.36, 0.51) 
 				random_soles_position_z = random.uniform(0.01, 0.01)
 
 				# New sole orientation	
