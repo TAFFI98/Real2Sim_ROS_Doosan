@@ -48,10 +48,10 @@ def main(folder_dataset, sole_name):
 		
 		# -------------------- End of episodes ------------------#
 		rospy.signal_shutdown("EPISODES ENDED")
-		
+	
+	print ("Total num of episodes completed, Exiting ....")
 
 
-	print ("Total num of episode completed, Exiting ....")
 if __name__ == '__main__':
 	# Define folder for dataset storage
 	folder_dataset = '/root/catkin_ws/dataset_learn_to_see/'

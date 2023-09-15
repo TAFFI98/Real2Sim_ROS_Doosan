@@ -2,7 +2,7 @@ moveit_setup_assistant_config:
   URDF:
     package: dsr_description
     relative_path: xacro/a0509.urdf.xacro
-    xacro_args: --inorder gripper:=deburring_tool
+    xacro_args: --inorder namespace:=dsr color:=$(arg color) gripper:=deburring_tool
   SRDF:
     relative_path: config/a0509.srdf
   CONFIG:
