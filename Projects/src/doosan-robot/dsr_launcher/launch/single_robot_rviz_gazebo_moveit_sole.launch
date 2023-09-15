@@ -15,6 +15,9 @@
   <arg name="camera" default="true"/>
   <arg name="sole_n" default="1"/> 
 
+
+
+
   <!-- Start Gazebo with an empty world. -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="use_sim_time" value="true"/>
@@ -122,11 +125,36 @@
   <!-- Spawn the camera -->
   <group if="$(arg camera)">
     <include file="$(find realsense2_description)/launch/view_d435i_model_rviz_gazebo.launch">    </include>
-    <node name="dmodel" pkg="dsr_launcher" type="dmodel_camera.py"/>  
-  </group>
+  </group> 
 
   <!-- wold, map and dsr01/world are coincident reference frames -->
   <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 world map 100" />
   <node pkg="tf" type="static_transform_publisher" name="dsr01_world_broadcaster" args="0 0 0 0 0 0 world dsr01/world 100" />
-  
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_world__broadcaster" args="0 0 0 0 0 0 world dsr01a0509/world 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_world_broadcaster" args="0 0 0 0 0 0 dsr01/world dsr01a0509/world 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_base_0_broadcaster" args="0 0 0 0 0 0 dsr01/base_0 dsr01a0509/base_0 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_link1_broadcaster" args="0 0 0 0 0 0 dsr01/link1 dsr01a0509/link1 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_link2_broadcaster" args="0 0 0 0 0 0 dsr01/link2 dsr01a0509/link2 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_link3_broadcaster" args="0 0 0 0 0 0 dsr01/link3 dsr01a0509/link3 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_link4_broadcaster" args="0 0 0 0 0 0 dsr01/link4 dsr01a0509/link4 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_link5_broadcaster" args="0 0 0 0 0 0 dsr01/link5 dsr01a0509/link5 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_link6_broadcaster" args="0 0 0 0 0 0 dsr01/link6 dsr01a0509/link6 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_tool_broadcaster" args="0 0 0 0 0 0 dsr01/tool dsr01a0509/tool 100" />
+  <node pkg="tf" type="static_transform_publisher" name="dsr01a0509_tcp_broadcaster" args="0 0 0 0 0 0 dsr01/tcp dsr01a0509/tcp 100" />
+
+  <!-- View in RVIZ. -->
+  <group if="$(arg rviz)">
+    <node name="dmodel" pkg="dsr_launcher" type="dmodel_camera.py"/>  
+  </group>
+
+
+    <!-- MOVEIT -->
+  <group if="$(eval arg('model') == 'a0509' and arg('gripper') == 'deburring_tool')">
+      <include file="$(find moveit_config_a0509_deburring)/launch/a0509.launch" ns="dsr01$(arg model)" >
+          <arg name="fake_execution" value="false"/>
+          <arg name="color" value="$(arg color)"/>
+          <arg name="gripper" value="$(arg gripper)"/>
+      </include>
+  </group>
+
 </launch>

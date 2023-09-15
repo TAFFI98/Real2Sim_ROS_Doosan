@@ -1,0 +1,10 @@
+<?xml version="1.0"?>   
+<launch>
+    <!-- MOVEIT -->
+    
+      <include file="$(find moveit_config_a0509_deburring)/launch/a0509.launch" >
+          <arg name="fake_execution" value="false"/>
+          <arg name="color" value="blue"/>
+          <arg name="gripper" value="deburring_tool"/>
+      </include>
+</launch>
