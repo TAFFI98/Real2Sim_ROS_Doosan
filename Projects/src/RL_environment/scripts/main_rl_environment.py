@@ -3,8 +3,14 @@ from pyquaternion import Quaternion
 import cv2
 import numpy as np
 import rospy
+import threading
 import time
 import random
+import sys
+import os
+sys.dont_write_bytecode = True
+sys.path.append( os.path.abspath(os.path.join("/root/catkin_ws/src/doosan-robot/common/imp")) ) # get import path : DSR_ROBOT.py 
+from DSR_ROBOT import *
 
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import PoseStamped
@@ -13,14 +19,12 @@ from sensor_msgs.msg import Image
 from gazebo_msgs.srv import GetLinkState ,SetLinkState
 from gazebo_msgs.msg import ModelState, LinkState
 
-import moveit_commander
-import moveit_msgs.msg
-
 
 class MyRLEnvironmentNode(): 
-        def __init__ (self):
-            print ("Initializing MyRLEnvironmentNode Node.....")
-            
+        def __init__ (self, ROBOT_ID, ROBOT_MODEL):
+            print("Initializing MyRLEnvironmentNode Node.....")
+            self.bridge = CvBridge()	
+
             # -------------------- Image subscriber ------------------#
             self.suscriber_image = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)
             
@@ -36,18 +40,30 @@ class MyRLEnvironmentNode():
             self.sole_ori_w = self.sole_coordinates.link_state.pose.orientation.w
             
             # -------------------- Client to reset the sole position ------------------#
-            self.set_model_coordinates = rospy.ServiceProxy('/dsr01a0509/motion/ikin', SetLinkState)			
+            self.set_model_coordinates = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)			
             
-            # -------------------- MOVEIT interface ------------------#
-            rospy.wait_for_service('/dsr01a0509/motion/ikin')
-            
-            print('Initialized MyRLEnvironmentNode Node')
-		
+            # --------------------  ROBOT interface ------------------#
+            self.ROBOT_ID = ROBOT_ID
+            self.ROBOT_MODEL = ROBOT_MODEL
+            self.velx=[50, 50]
+            self.accx=[100, 100]
+            print("Initialized MyRLEnvironmentNode Node")
+        
+        def thread_subscriber(self):
+            self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
+            rospy.spin()
+        
+        def msgRobotState_cb(self,msg):
+            self.current_EE_pos = [msg.current_posx[0],msg.current_posx[1],msg.current_posx[2],msg.current_posx[3],msg.current_posx[4],msg.current_posx[5]]
+
+
+
+
         def image_callback(self, image_msg):
             # -------------------- Read image------------------#
             try:
                 self.cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
-                print("Image received")
+                #print("Image received")
             except CvBridgeError as e:
                 rospy.logerr(e)
                 return
@@ -126,20 +142,62 @@ class MyRLEnvironmentNode():
                 except rospy.ServiceException:
                     print("/gazebo/set_link_state service call failed")
         
-        def  get_end_effector_position(self):
-            pass
+        def reset_evironment(self, initial_sole_ori):
+            # -------------------- RESET SOLE POSITION ------------------#
+            self.set_new_sole_position(initial_ori = initial_sole_ori) 
+            # -------------------- RESET ROBOT POSe ------------------#
+            self.reset_robot_pose()
 
-        def  reset_evironment(self):
-            pass
+        def reset_robot_pose(self):
+            q0 = posj(0,0,0,0,0,0)
+            movej(q0, vel=60, acc=30)
 
-        def  action_step_perform_trajectory(self):
-            pass
+        def  action_step_perform_trajectory(self,traj):
+            # -------------------- EXECUTE TRAJECTORY------------------#
+            initial_pos = traj[0]
+            success =  self.action_step_perform_position_movejx(initial_pos)
+            
+            print('Trajectory started..')
+            for pos in traj[1:]:
+                success =  self.action_step_perform_position_moveL(pos)
+            
+            print('Trajectory executed.. ')
+
+        def  action_step_perform_position_movejx(self, pos):
+            # -------------------- EXECUTE MOVEJX------------------#
+            success = movejx(pos, vel=60, acc=60, sol=2)
+            print('Initial position reached')
+
+        def  action_step_perform_position_moveL(self, pos):
+            # -------------------- EXECUTE MOVEL------------------#
+            success = movel(pos, self.velx, self.accx)
+
+        def action_step_generate_position(self):
+            # -------------------- POSITION GENERATION------------------#
+            x = random.uniform( -200, 120)   
+            y = random.uniform(360, 510)	 
+            z = random.uniform(10, 10)  
+            W = random.uniform(0, 360)	  # z-direction rotation of reference coordinate system
+            P = random.uniform(90, 270)	  # y-direction rotation of w rotated coordinate system
+            R = random.uniform(0, 0)    # z-direction rotation of of w and p rotated coordinate system
+            
+            return posx(x,y,z,W,P,R)
 
         def  action_step_generate_trajectory(self):
-            pass
+            # -------------------- TRAJECTORY GENERATION------------------#
+            x1 = self.action_step_generate_position()   
+            x2 = self.action_step_generate_position()	 
+            x3 = self.action_step_generate_position() 
+            x4 = self.action_step_generate_position()	 
+            x5 = self.action_step_generate_position()	 
+            x6 = self.action_step_generate_position()  
+            x7 = self.action_step_generate_position()  
+            print('Trajectory generated')
+            return [x1, x2, x3, x4, x5, x6, x7]
 
         def  calculate_reward(self):
+            # sole_pos, sole_ori = self.get_current_sole_pose() 	
+            # EE_pose = self.current_EE_pos
             pass
-
-        def  cdefine_state_space(self):
+        def  define_state_space(self):
             pass
