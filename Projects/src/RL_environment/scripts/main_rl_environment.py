@@ -8,6 +8,7 @@ import time
 import random
 import sys
 import os
+import pickle
 sys.dont_write_bytecode = True
 sys.path.append( os.path.abspath(os.path.join("/root/catkin_ws/src/doosan-robot/common/imp")) ) # get import path : DSR_ROBOT.py 
 from DSR_ROBOT import *
@@ -19,9 +20,11 @@ from sensor_msgs.msg import Image
 from gazebo_msgs.srv import GetLinkState ,SetLinkState
 from gazebo_msgs.msg import ModelState, LinkState
 
+from scipy.spatial.transform import Rotation as R
+import tf.transformations as tr
 
 class MyRLEnvironmentNode(): 
-        def __init__ (self, ROBOT_ID, ROBOT_MODEL):
+        def __init__ (self, ROBOT_ID, ROBOT_MODEL, sole_number):
             print("Initializing MyRLEnvironmentNode Node.....")
             self.bridge = CvBridge()	
 
@@ -31,13 +34,8 @@ class MyRLEnvironmentNode():
             # -------------------- Client to get the sole position ------------------#
             self.model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)			
             self.sole_coordinates = self.model_coordinates( "sole::sole_link" , "world" )
-            self.sole_z = self.sole_coordinates.link_state.pose.position.z
-            self.sole_y = self.sole_coordinates.link_state.pose.position.y
-            self.sole_x = self.sole_coordinates.link_state.pose.position.x
-            self.sole_ori_x = self.sole_coordinates.link_state.pose.orientation.x
-            self.sole_ori_y = self.sole_coordinates.link_state.pose.orientation.y
-            self.sole_ori_z = self.sole_coordinates.link_state.pose.orientation.z
-            self.sole_ori_w = self.sole_coordinates.link_state.pose.orientation.w
+            self.sole_position = self.sole_coordinates.link_state.pose.position
+            self.sole_orientation = self.sole_coordinates.link_state.pose.orientation
             
             # -------------------- Client to reset the sole position ------------------#
             self.set_model_coordinates = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)			
@@ -47,17 +45,141 @@ class MyRLEnvironmentNode():
             self.ROBOT_MODEL = ROBOT_MODEL
             self.velx=[50, 50]
             self.accx=[100, 100]
+            
+            # --------------------  Ground truth burr position and tool orientation ------------------#
+            # -------- Burr position and orintation with respect to sole reference frame --------- #
+            self.local_coord_path = '/root/catkin_ws/src/RL_environment/scripts/dataset_config/suola_%s.txt' % (sole_number) 
+            self.local_traj, self.R_tool= self.define_local_position_traj(self.local_coord_path)
+            # -------- Burr position and orintation with respect to global reference frame --------- #
+            self.transformation_matrix_global_local = self.define_tansformation_matrix_global_to_sole_frame(self.sole_position, self.sole_orientation)
+            self.global_traj =  self.define_global_position_traj(self.transformation_matrix_global_local, self.local_traj)
+            self.global_R_tool_quat =  self.define_global_orientation_traj(self.transformation_matrix_global_local, self.R_tool)
+
+
+
             print("Initialized MyRLEnvironmentNode Node")
-        
+        def rotation_matrix_to_quaternion(self, R):
+            """
+            Convert a 3x3 rotation matrix to a unit quaternion.
+
+            Args:
+                R (np.ndarray): The 3x3 rotation matrix.
+
+            Returns:
+                np.ndarray: The unit quaternion [w, x, y, z].
+            """
+            # Ensure the input matrix is a valid rotation matrix (orthogonal with determinant 1)
+            if not np.allclose(np.dot(R.T, R), np.eye(3)) or not np.isclose(np.linalg.det(R), 1.0):
+                raise ValueError("Input matrix is not a valid rotation matrix.")
+
+            # Extract the components of the rotation matrix
+            r11, r12, r13 = R[0]
+            r21, r22, r23 = R[1]
+            r31, r32, r33 = R[2]
+
+            # Calculate the quaternion components
+            w = 0.5 * np.sqrt(1 + r11 + r22 + r33)
+            x = (r32 - r23) / (4 * w)
+            y = (r13 - r31) / (4 * w)
+            z = (r21 - r12) / (4 * w)
+
+            return np.array([w, x, y, z])     
+
+        def define_global_orientation_traj(self, transformation_matrix, R_tool):
+
+
+                #--------- Burr points in global reference frame -------- #
+                global_R_tool_quat = np.empty((R_tool.shape[0], 4))
+                for i in range(R_tool.shape[0]):
+                    matrix = np.matmul(transformation_matrix[:3,:3],R_tool[i,:,:])
+                    global_R_tool_quat[i,:] = self.rotation_matrix_to_quaternion(matrix)
+
+                return global_R_tool_quat 
+
+        def define_global_position_traj(self, transformation_matrix, local_traj):
+                #--------- Burr points in global reference frame -------- #
+                global_traj = np.empty((local_traj.shape[0], 4))
+                for i in range(local_traj.shape[0]):
+                    global_traj[i,:]= np.matmul(transformation_matrix,local_traj[i,:])
+                return global_traj 
+
+        def define_tansformation_matrix_global_to_sole_frame(self, sole_position, sole_orientation ):
+            position = np.multiply(np.expand_dims(np.asarray([sole_position.x,sole_position.y,sole_position.z]),axis=0),np.array([[1000,1000,1000]], np.float32))
+            orientation = np.asarray([sole_orientation.x,sole_orientation.y,sole_orientation.z,sole_orientation.w])
+            orientation = Quaternion(orientation[0], orientation[1], orientation[2], orientation[3])
+            rotation_matrix = orientation.rotation_matrix
+            upper_matrix = np.concatenate((rotation_matrix, position.T), axis=1)
+            lower_matrix = np.array([[0,0,0,1]])
+            transformation_matrix = np.concatenate((upper_matrix, lower_matrix), axis=0)
+            
+            return transformation_matrix
+
+        def is_rotation_matrix(self,matrix):
+            # Check if the matrix is square
+            if matrix.shape != (3, 3):
+                return False
+            
+            # Check orthogonality
+            is_orthogonal = np.allclose(np.dot(matrix.T, matrix), np.identity(3))
+            
+            # Check determinant
+            det = np.linalg.det(matrix)
+            is_proper_rotation = np.isclose(det, 1.0)
+            
+            # Check transpose inverse
+            is_transpose_inverse = np.allclose(np.dot(matrix.T, matrix), np.identity(3))
+            
+            return is_orthogonal and is_proper_rotation and is_transpose_inverse
+
+        def define_local_position_traj(self, local_coord_path):
+            #--------- Burr points in sole reference frame -------- #
+            with open(local_coord_path, 'rb') as handle_1:
+                data_1 = handle_1.read()
+            local_obj = pickle.loads(data_1) #KEYS ARE: ['OX', 'OY', 'deltaX', 'deltaY', 'tx', 'ty', 'nx', 'ny']
+
+            # --------- POSITION TRAJECTORY ----------- #
+            n_points = local_obj['tx'].shape[0]
+            OX, OY, OZ = local_obj['OX'], local_obj['OY'], 0 
+            delta_X, delta_Y = local_obj['deltaX'],local_obj['deltaY']
+            local_pos_origin = np.asarray([OX, OY, OZ,1.0])
+            local_X_traj = delta_X + OX
+            local_Y_traj = delta_Y + OY
+            local_traj = np.empty((local_X_traj.shape[0], 4))
+            for i in range(local_X_traj.shape[0]):
+                local_traj[i,0]= local_X_traj[i]
+                local_traj[i,1]= local_Y_traj[i]
+                local_traj[i,2]= OZ
+                local_traj[i,3]= 1.0
+            local_traj = np.concatenate((np.expand_dims(local_pos_origin,axis =0), local_traj), axis=0)
+            
+            # --------- ORIENTATION TRAJECTORY ----------- #
+            tx, ty, nx, ny = local_obj['tx'], local_obj['ty'], local_obj['nx'],local_obj['ny']
+            
+            # ---- Rotation matrix from ref frame in the center of the sole and the one centered on the burr point ---#
+            rotation_matrix_O_O1 = np.empty((n_points,3,3)) 
+            for i in range(n_points):
+                t = np.array([tx[i] , ty[i] , 0])
+                n = np.array([nx[i] , ny[i] , 0])
+                z = np.cross(t,n)
+                rotation_matrix_O_O1[i,:,:] = np.column_stack((t, n, z))
+
+            # ----Tool orientation in reference frame centered in the burr (t-n-z)---#
+            d1 = R.from_euler('xzy', [-180,-135, -45],degrees=True).as_quat()
+            d1 = Quaternion(d1[0], d1[1], d1[2], d1[3]).rotation_matrix
+
+            # ----Tool orientation in reference frame in the center of the sole ---#
+            R_tool = np.empty((n_points,3,3)) 
+            for i in range(n_points):
+                R_tool[i,:,:]  = np.matmul(d1,rotation_matrix_O_O1[i,:,:])
+            return local_traj, R_tool
+
+
         def thread_subscriber(self):
             self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
             rospy.spin()
         
         def msgRobotState_cb(self,msg):
             self.current_EE_pos = [msg.current_posx[0],msg.current_posx[1],msg.current_posx[2],msg.current_posx[3],msg.current_posx[4],msg.current_posx[5]]
-
-
-
 
         def image_callback(self, image_msg):
             # -------------------- Read image------------------#
@@ -153,16 +275,50 @@ class MyRLEnvironmentNode():
             movej(q0, vel=60, acc=30)
 
         def  action_step_perform_trajectory(self,traj):
-            # -------------------- EXECUTE TRAJECTORY------------------#
-            initial_pos = traj[0]
-            success =  self.action_step_perform_position_movejx(initial_pos)
             
-            print('Trajectory started..')
-            for pos in traj[1:]:
-                success =  self.action_step_perform_position_moveL(pos)
-            
-            print('Trajectory executed.. ')
+            # ------ Real initial pose: Orientation as quaternion -----#
+            initial_pose = traj[0]
+            initial_position = initial_pose[0:3]
+            initial_orientation = Quaternion(R.from_euler('zyz', initial_pose[3:]).as_quat())
 
+            # ------ Ground-truth initial pose -----#
+            initial_position_true = self.global_traj[0][0:3]
+            initial_orientation_true = Quaternion(self.global_R_tool_quat[0])
+
+            # -------------------- EXECUTE TRAJECTORY------------------#
+            success =  self.action_step_perform_position_movejx(initial_pose)
+
+            # -------------------- COMPUTE REWARD ------------------#
+            reward_initial_position = self.calculate_reward_position(initial_position,  initial_position_true)
+            reward_initial_orientation = self.calculate_reward_orientation(initial_orientation,  initial_orientation_true)
+            reward = reward_initial_position + reward_initial_orientation
+            print('Reward:', reward)
+            
+
+            print('Trajectory started..')            
+            for i,pose in enumerate(traj[1:]):
+                # ------  Real pose: Orientation as quaternion -----#
+                position = pose[0:3]
+                orientation = Quaternion(R.from_euler('zyz', pose[3:]).as_quat())
+
+                #  ------ Ground-truth pose -----#
+                position_true = self.global_traj[i][0:3]
+                orientation_true = Quaternion(self.global_R_tool_quat[i])
+
+                # -------------------- EXECUTE TRAJECTORY------------------#
+                success =  self.action_step_perform_position_moveL(pose)
+                
+                # -------------------- COMPUTE REWARD ------------------#
+                reward_position = self.calculate_reward_position(position,  initial_position_true)
+                reward_orientation = self.calculate_reward_orientation(orientation,  orientation_true)
+                reward = reward + reward_position + reward_orientation
+                print('Reward:', reward)
+
+
+
+            print('Trajectory executed.. ')
+            print('Final Reward:', reward)
+            
         def  action_step_perform_position_movejx(self, pos):
             # -------------------- EXECUTE MOVEJX------------------#
             success = movejx(pos, vel=60, acc=60, sol=2)
@@ -173,31 +329,34 @@ class MyRLEnvironmentNode():
             success = movel(pos, self.velx, self.accx)
 
         def action_step_generate_position(self):
-            # -------------------- POSITION GENERATION------------------#
+            # -------------------- TCP POSE GENERATION------------------#
             x = random.uniform( -200, 120)   
             y = random.uniform(360, 510)	 
             z = random.uniform(10, 10)  
             W = random.uniform(0, 360)	  # z-direction rotation of reference coordinate system
             P = random.uniform(90, 270)	  # y-direction rotation of w rotated coordinate system
-            R = random.uniform(0, 0)    # z-direction rotation of of w and p rotated coordinate system
+            R = random.uniform(0, 0)      # z-direction rotation of of w and p rotated coordinate system
             
             return posx(x,y,z,W,P,R)
 
-        def  action_step_generate_trajectory(self):
+        def  action_step_generate_trajectory(self, n_steps = 7):
             # -------------------- TRAJECTORY GENERATION------------------#
-            x1 = self.action_step_generate_position()   
-            x2 = self.action_step_generate_position()	 
-            x3 = self.action_step_generate_position() 
-            x4 = self.action_step_generate_position()	 
-            x5 = self.action_step_generate_position()	 
-            x6 = self.action_step_generate_position()  
-            x7 = self.action_step_generate_position()  
-            print('Trajectory generated')
-            return [x1, x2, x3, x4, x5, x6, x7]
+            traj = []
+            for i in range(n_steps):
+                traj.append(self.action_step_generate_position())
+            print('Trajectory with %s steps generated' % (n_steps))
+            return traj
 
-        def  calculate_reward(self):
-            # sole_pos, sole_ori = self.get_current_sole_pose() 	
-            # EE_pose = self.current_EE_pos
-            pass
+        def calculate_reward_position(self, point1, point2):
+            # -------------------- EUCLIDEAN DISTANCE BETWEEN 2 CARTESIAN POINTS------------------#           
+            reward = np.linalg.norm(point1  - point2)
+            return reward
+
+        def calculate_reward_orientation(self, q0,  q1 ):
+            # -------------------- QUATERNION DISTANCE BETWEEN 2 ORIENTATIONS------------------#           
+            reward = Quaternion.absolute_distance(q0, q1)
+            return reward        
+
+
         def  define_state_space(self):
             pass

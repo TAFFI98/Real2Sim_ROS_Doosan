@@ -10,6 +10,7 @@ sys.path.append( os.path.abspath(os.path.join("/root/catkin_ws/src/doosan-robot/
 # for single robot 
 ROBOT_ID     = "dsr01"
 ROBOT_MODEL  = "a0509"
+sole_n = 10
 import DR_init
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
@@ -23,7 +24,7 @@ from main_rl_environment import MyRLEnvironmentNode
 
 if __name__ == "__main__":
     rospy.init_node('MY_RL_ENVINRONMENT')
-    RL_node = MyRLEnvironmentNode(ROBOT_ID,ROBOT_MODEL)
+    RL_node = MyRLEnvironmentNode(ROBOT_ID,ROBOT_MODEL,sole_n)
     set_robot_mode  = rospy.ServiceProxy('/'+ROBOT_ID + ROBOT_MODEL+'/system/set_robot_mode', SetRobotMode)
    
     t1 = threading.Thread(target = RL_node.thread_subscriber)
@@ -60,6 +61,7 @@ if __name__ == "__main__":
             
             # -------------------- PERFORM ACTION: EXECUTE TRAJECTORY ------------------#
             RL_node.action_step_perform_trajectory(action)
+            
             time.sleep(2)
 
             print ('Episode %s Ended'% (episode+1))

@@ -36,19 +36,42 @@ roslaunch dsr_launcher dsr_moveit_gazebo.launch model:=a0509  color:=blue  mode:
 MOVEIT SETUP ASSISTANT
 roslaunch moveit_setup_assistant setup_assistant.launch
 
-# RVIZ GAZEBO WITH SOLE
-roslaunch dsr_launcher single_robot_rviz_gazebo_sole.launch model:=a0509  color:=blue gripper:=deburring_tool mode:=virtual sole:=true sole_n:=10
+# RVIZ GAZEBO WITH SOLE (LAUNCH FILE FOR LEARN TO SEE DATASET GENERATION AND RL_ENVIRONEMNT)
+roslaunch dsr_launcher single_robot_rviz_gazebo_moveit_sole.launch model:=a0509  color:=blue gripper:=deburring_tool mode:=virtual sole:=true sole_n:=10
 
-# DATASET GENERATION
+# LEARN TO SEE DATASET GENERATION
 rosrun learn_to_see run_learn_to_see.py
 
+# RL ENVIRONMENT
+rosrun RL_environment run_environment.py
+
+
+
 #Transformation from color camera to world frame
-rosrun tf tf_echo world camera_color_frame 
+rosrun tf tf_echo world camera_link
 
 - Translation: [-0.032, 0.513, 0.489]
 - Rotation: in Quaternion [-0.500, 0.500, 0.500, 0.500]
             in RPY (radian) [0.000, 1.570, 1.570]
             in RPY (degree) [0.000, 89.954, 89.954]
             
-            
+# Create conda env for 3D to 2D Transformation            
 conda env create -f /root/catkin_ws/learn_to_see_mapping/environment.yml
+
+# Create conda env for burrs local position annotaion            
+
+conda env create -f /root/catkin_ws/Random_soles_dataset/environment_PY3.yml
+conda install nurbspy --channel conda-forge --channel roberagro
+python /root/catkin_ws/Random_soles_dataset/spline_fit.py
+
+# MAKE EXECUTABLES PYTHON FILES
+chmod +x file.py
+
+# PDF file with TF frames
+rosrun tf view_frames
+
+# KILL NODE
+rosnode kill /robot_state_publisher
+
+# UPDATE CONDA
+conda update -n base -c defaults conda
