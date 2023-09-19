@@ -180,7 +180,7 @@ class MyRLEnvironmentNode():
         
         def msgRobotState_cb(self,msg):
             self.current_EE_pos = [msg.current_posx[0],msg.current_posx[1],msg.current_posx[2],msg.current_posx[3],msg.current_posx[4],msg.current_posx[5]]
-
+            print(self.current_EE_pos)
         def image_callback(self, image_msg):
             # -------------------- Read image------------------#
             try:

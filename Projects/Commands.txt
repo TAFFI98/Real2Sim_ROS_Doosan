@@ -50,11 +50,12 @@ rosrun RL_environment run_environment.py
 #Transformation from color camera to world frame
 rosrun tf tf_echo world camera_link
 
-- Translation: [-0.032, 0.513, 0.489]
-- Rotation: in Quaternion [-0.500, 0.500, 0.500, 0.500]
-            in RPY (radian) [0.000, 1.570, 1.570]
-            in RPY (degree) [0.000, 89.954, 89.954]
+rosrun tf tf_echo link6 tcp
             
+- Translation: [-0.010, 0.008, 0.166]
+- Rotation: in Quaternion [-0.085, 0.000, 0.000, 0.996]
+            in RPY (radian) [-0.170, 0.000, 0.000]
+            in RPY (degree) [-9.740, 0.000, 0.000]
 # Create conda env for 3D to 2D Transformation            
 conda env create -f /root/catkin_ws/learn_to_see_mapping/environment.yml
 
@@ -75,3 +76,7 @@ rosnode kill /robot_state_publisher
 
 # UPDATE CONDA
 conda update -n base -c defaults conda
+
+
+rosservice call /dsr01a0509/tcp/config_create_tcp tcp [-10,8,166,-9.740,0,0]
+rosservice call /dsr01a0509/tcp/set_current_tcp tcp

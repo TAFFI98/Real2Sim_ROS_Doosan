@@ -36,7 +36,9 @@ if __name__ == "__main__":
     
 
     get_tcp = rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+ '/tcp/get_current_tcp', GetCurrentTcp)
-    print(get_tcp())
+    p0 = [-10,8,166,-9.740,0,0]
+    add_tcp("tcp", p0)
+    set_tcp("tcp")
 
 
     while not rospy.is_shutdown():
