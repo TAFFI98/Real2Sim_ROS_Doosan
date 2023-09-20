@@ -31,7 +31,7 @@ RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro melodic -r
 WORKDIR /root/catkin_ws/
 RUN rosdep install --from-paths src --ignore-src --rosdistro melodic
 RUN sudo apt install python-pip -y
-RUN pip install pyquaternion pathlib scipy
+RUN pip install pyquaternion pathlib scipy pyrealsense2
 # add environment setup 
 RUN echo 'source /opt/ros/melodic/setup.bash' >> /root/.bashrc
  

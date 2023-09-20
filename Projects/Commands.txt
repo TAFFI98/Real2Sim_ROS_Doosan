@@ -53,10 +53,18 @@ rosrun tf tf_echo world camera_link
 rosrun tf tf_echo link6 tcp
             
 - Translation: [-0.010, 0.008, 0.166]
-- Rotation: in Quaternion [-0.085, 0.000, 0.000, 0.996]
-            in RPY (radian) [-0.170, 0.000, 0.000]
-            in RPY (degree) [-9.740, 0.000, 0.000]
-# Create conda env for 3D to 2D Transformation            
+- Rotation: in Quaternion [0.000, 0.000, 0.942, 0.334]
+            in RPY (radian) [0.000, -0.000, 2.460]
+            in RPY (degree) [0.000, -0.000, 140.948]
+
+TOOL----> TCP 
+<origin rpy="0 0 2.46" xyz="-0.00966 0.00772  0.166" />
+LINK6----> TCP 
+<origin rpy="0 0 2.46" xyz="-0.00966 0.00772  0.166" />
+
+
+# Create conda env for 3D to 2D Transformation  
+
 conda env create -f /root/catkin_ws/learn_to_see_mapping/environment.yml
 
 # Create conda env for burrs local position annotaion            
@@ -77,6 +85,9 @@ rosnode kill /robot_state_publisher
 # UPDATE CONDA
 conda update -n base -c defaults conda
 
+# CALL SERVICE TO CONFIGURE AND SET TCP
+rosservice call /dsr01/tcp/config_create_tcp tcp [-10,8,166,0,0,2.460]
+rosservice call /dsr01/tcp/set_current_tcp tcp
 
-rosservice call /dsr01a0509/tcp/config_create_tcp tcp [-10,8,166,-9.740,0,0]
-rosservice call /dsr01a0509/tcp/set_current_tcp tcp
+# READ THE STATE OF THE CURRENT SET TCP
+rostopic echo /dsr01a0509/state

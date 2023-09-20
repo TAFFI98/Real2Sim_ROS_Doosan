@@ -35,7 +35,7 @@
 	<joint name="joint8" type="fixed">
 		<parent link="tool" />
 		<child link="tcp" />
-		<origin rpy="-0.17 0 0" xyz="-0.00966 0.00772  0.166" />
+		<origin rpy="0 0 2.46" xyz="-0.00966 0.00772  0.166" />
 	</joint>
 
   <!-- tcp -->
@@ -55,7 +55,7 @@
 			</material>
 		</visual>
 		<collision>
-			<origin rpy="2.96  0 0" xyz="0 0 0" />
+			<origin rpy="0 0 0" xyz="0 0 0" />
 			<geometry>
 				<sphere radius="0.0015"/>
 			</geometry>
