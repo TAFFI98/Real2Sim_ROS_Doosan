@@ -10,6 +10,7 @@ from geometry_msgs.msg import PoseStamped
 from gazebo_msgs.srv import GetLinkState ,SetLinkState
 import random
 from gazebo_msgs.msg import ModelState, LinkState
+from scipy.spatial.transform import Rotation as R
 
 
 class LearnToSeeNode(): 
@@ -61,6 +62,7 @@ class LearnToSeeNode():
 
 
 		def get_current_sole_pose(self):
+			rospy.wait_for_service('/gazebo/get_link_state')
 			# -------------------- Get current position of the sole------------------#
 			self.sole_coordinates = self.model_coordinates( "sole::sole_link" , "world" )
 			self.sole_z = self.sole_coordinates.link_state.pose.position.z
@@ -76,24 +78,21 @@ class LearnToSeeNode():
 			return pos, ori			
 	
 
-		def set_new_sole_position(self, initial_ori):
+		def set_new_sole_position(self):
 			# -------------------- Set new position of the sole------------------#
 				state = LinkState()
 				state.link_name = "sole::sole_link"
 				state.reference_frame = 'world'  
 
 				# New sole position 
-				random_soles_position_x = random.uniform( -0.20, 0.12) 
-				random_soles_position_y = random.uniform( 0.36, 0.51) 
+				random_soles_position_x = random.uniform( -0.15, 0.10) 
+				random_soles_position_y = random.uniform( 0.4, 0.5) 
 				random_soles_position_z = random.uniform(0.01, 0.01)
 
 				# New sole orientation	
-				initial_quaternion  = Quaternion(initial_ori[0], initial_ori[1], initial_ori[2], initial_ori[3])
 				random_angle = random.uniform(0, 6.28)
-				rotation_quaternion = Quaternion(axis=[1, 0,0], angle=random_angle)
-				rotation2_quaternion = Quaternion(axis=[0, 0,1], angle= 3.14)
-				my_quaternion = initial_quaternion.rotate(rotation_quaternion)
-				my_quaternion = my_quaternion.rotate(rotation2_quaternion)
+				my_quaternion =  R.from_euler('xyz',[0,0,random_angle]).as_quat()
+				my_quaternion = Quaternion(my_quaternion[0], my_quaternion[1], my_quaternion[2], my_quaternion[3])
 
 				# pose
 				state.pose.position.x = random_soles_position_x
@@ -111,7 +110,8 @@ class LearnToSeeNode():
 				state.twist.angular.x = 0
 				state.twist.angular.y = 0
 				state.twist.angular.z = 0
-
+				print(' NEW SOLE POSE:')
+				print(state.pose)
 				rospy.wait_for_service('/gazebo/set_link_state')
 				time.sleep(3.0)
 				try:

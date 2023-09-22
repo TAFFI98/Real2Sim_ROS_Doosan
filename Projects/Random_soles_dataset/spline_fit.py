@@ -50,11 +50,12 @@ if __name__ == '__main__':
             U = np.concatenate((np.zeros(p), np.linspace(0, 1, n - p + 2), np.ones(p)))
 
             # Create and plot the NURBS curve
-            fig = plt.figure(figsize=(6, 5))
+            fig = plt.figure(figsize=(12, 10))
             ax = fig.add_subplot(111)
             ax.set_title(file.strip('.txt'))
             ax.set_xlabel('X')
             ax.set_ylabel('Y')
+            plt.grid(True)
 
             # Define a u-parametrization suitable for finite differences
             h = 1e-4
@@ -68,7 +69,7 @@ if __name__ == '__main__':
             tangent = np.single(nurbs2D.get_tangent(u))
             normal = np.single(nurbs2D.get_normal(u))
 
-            nurbs2D.plot(fig=fig, ax=ax,curve=True, control_points=True, frenet_serret=False, axis_off=False, ticks_off=False)
+            nurbs2D.plot(fig=fig, ax=ax,curve=True, control_points=False, frenet_serret=False, axis_off=False, ticks_off=False)
             # Plot the tangent vector ---- X, Y define the arrow locations, U, V define the arrow directions
             x, y = position
             tx, ty = tangent
@@ -83,11 +84,12 @@ if __name__ == '__main__':
                 n = np.array([nx[i] , ny[i] , 0])
                 z = np.cross(t,n)
                 if z[-1] > 0:
-                    ax.quiver(x[i], y[i], tx[i], ty[i], color='red', scale=4)
-                    ax.quiver(x[i], y[i], nx[i], ny[i], color='blue', scale=4)
-                    # R = np.column_stack((t, n, z))
-                    # q8d = Quaternion(matrix=R)
-                    # print(q8d.rotation_matrix)
+                    if i == 150 or i== 199 or i == 0 or i ==50: 
+                        ax.quiver(x[i], y[i], tx[i], ty[i], color='red', scale=8, width=0.008)
+                        ax.quiver(x[i], y[i], nx[i], ny[i], color='blue', scale=8, width = 0.008)  
+                    R = np.column_stack((t, n, z))
+                    q8d = Quaternion(matrix=R)
+                    print(q8d.rotation_matrix)
                     tx_final[i] = tx[i]
                     ty_final[i] = ty[i]
                     nx_final[i] = nx[i]
@@ -95,34 +97,26 @@ if __name__ == '__main__':
 
 
                 if z[-1] < 0:  
-                    ax.quiver(x[i], y[i], tx[i], ty[i], color='red', scale=5)
-                    ax.quiver(x[i], y[i], -nx[i], -ny[i], color='blue', scale=5)                 
-                    # R = np.column_stack((t, -n, -z))
-                    # q8d = Quaternion(matrix=R)
-                    # print(q8d.rotation_matrix)
+                    if i == 150 or i== 199 or i == 0 or i ==50: 
+                        ax.quiver(x[i], y[i], tx[i], ty[i], color='red', scale=8, width = 0.008)
+                        ax.quiver(x[i], y[i], -nx[i], -ny[i], color='blue', scale=8, width = 0.008)                 
+                    R = np.column_stack((t, -n, -z))
+                    q8d = Quaternion(matrix=R)
+                    print(q8d.rotation_matrix)
                     tx_final[i] = tx[i]
                     ty_final[i] = ty[i]
                     nx_final[i] = -nx[i]
                     ny_final[i] = -ny[i]
 
-
-
-
-            # Plot the origin of the vectors
-            x, y = position
-            points, = ax.plot(x, y)
-            points.set_linestyle(' ')
-            points.set_marker('.')
-            points.set_markersize(5)
-            points.set_markeredgewidth(0.25)
-            points.set_markeredgecolor('k')
-            points.set_markerfacecolor('w')
-            points.set_zorder(4)
-
-
             # Save figures of burrs
+            plt.xlim(-100, 100)  # Replace x_min and x_max with your desired limits
+            plt.ylim(-150, 240)  # Replace y_min and y_max with your desired limits
+            ax.plot(0, 0, marker='o', markersize=5, linestyle='', color='g', lw=2)  # Adjust the linewidth as needed            
+            ax.quiver(0, 0, 1, 0, color='red', scale=6, width=0.008)
+            ax.quiver(0, 0, 0, 1, color='blue', scale=6, width = 0.008)  
             #plt.show()
             plt.savefig(path+'img/'+file.strip('.IGS.txt')+'.png')
+            plt.close('all')
 
             # Save annotations of ox, oy, tx, ty, nx, ny
 
@@ -146,4 +140,3 @@ if __name__ == '__main__':
             pickle.dump(dictionary, file_PY2, protocol=2)   # Dump python2
             file_PY3.close()
             file_PY2.close()
-

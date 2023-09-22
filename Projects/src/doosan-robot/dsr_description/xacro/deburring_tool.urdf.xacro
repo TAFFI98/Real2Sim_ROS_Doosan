@@ -5,7 +5,7 @@
   <link name="tool">
 		<inertial>
 			<mass value="0.03"/>
-			<origin rpy="3.14 0 0" xyz="0 0 0" />
+			<origin rpy="0 0 0" xyz="0 0 0" />
 			<inertia ixx="1.76151887e-07" ixy="-3.61499054e-12" ixz="-6.69977864e-11" iyy="1.76154141e-07"
 				iyz="-6.88153918e-11"
 				izz="2.91585994e-08"/>
@@ -13,13 +13,13 @@
 		<collision>
 						<max_contacts>5</max_contacts> 
 			<geometry>
-						<mesh filename="package://dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl" scale="1 1 1" />	
+						<mesh filename="package://dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl" scale="0.001 0.001 0.001" />	
 			</geometry>
 		</collision>
 		<visual>
-						<origin rpy="3.14 0 0" xyz="0 0 0" />
+						<origin rpy="0 0 0" xyz="0 0 0" />
 			<geometry>
-						<mesh filename="package://dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl" scale="1 1 1" />
+						<mesh filename="package://dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl" scale="0.001 0.001 0.001" />
 			</geometry>
 		</visual>
 	</link>

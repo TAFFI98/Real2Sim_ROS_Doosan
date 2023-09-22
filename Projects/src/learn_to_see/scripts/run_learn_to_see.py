@@ -5,6 +5,7 @@ import time
 from learn_to_see import LearnToSeeNode
 import rospy
 import json
+from sensor_msgs.msg import Image
 
 
 def main(folder_dataset, sole_name):
@@ -16,17 +17,13 @@ def main(folder_dataset, sole_name):
 		# -------------------- Define the number of different images in the dataset (different pose of the sole) ------------------#
 		num_episodes_init = 0	
 		num_episodes_end = 4
-		# -------------------- Evaluate the initial pose of the sole ------------------#
-		_, initial_sole_ori = learn_to_see_node.get_current_sole_pose() 
 		
 		# -------------------- Start episodes ------------------#
 		print("Starting episodes...")
-		time.sleep(1.0)
 		for episode in range (num_episodes_init,num_episodes_end):		
-			time.sleep(1.0)
 
 			# -------------------- Move sole to new position and orientation  ------------------#
-			learn_to_see_node.set_new_sole_position(initial_ori = initial_sole_ori) 
+			learn_to_see_node.set_new_sole_position() 
 			time.sleep(1.0)
 			
 			# -------------------- Get the new position and orientation of the sole ------------------#
@@ -40,8 +37,9 @@ def main(folder_dataset, sole_name):
 			json.dump(dict, file)
 			file.close()
 			print("Pose saved!")
-			
 			# -------------------- Save image ------------------# 
+			rospy.wait_for_message('/camera/color/image_raw', Image, timeout=5)
+
 			learn_to_see_node.image_saving(filename + '_%s_%s.png'% (sole_name, episode))
 			time.sleep(1.0)
 			print ('Episode %s Ended'% (episode+1))
@@ -55,7 +53,7 @@ def main(folder_dataset, sole_name):
 if __name__ == '__main__':
 	# Define folder for dataset storage
 	folder_dataset = '/root/catkin_ws/dataset_learn_to_see/'
-	sole_name = 'sole_22'
+	sole_name = 'sole_20'
 
 	main(folder_dataset, sole_name)
 

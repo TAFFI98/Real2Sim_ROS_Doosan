@@ -66,6 +66,9 @@ LINK6----> TCP
 # Create conda env for 3D to 2D Transformation  
 
 conda env create -f /root/catkin_ws/learn_to_see_mapping/environment.yml
+conda activate myenv
+python /root/catkin_ws/learn_to_see_mapping/3Dto2D.py
+
 
 # Create conda env for burrs local position annotaion            
 
