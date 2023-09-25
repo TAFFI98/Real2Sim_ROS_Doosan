@@ -80,46 +80,45 @@ class LearnToSeeNode():
 
 		def set_new_sole_position(self):
 			# -------------------- Set new position of the sole------------------#
-				state = LinkState()
-				state.link_name = "sole::sole_link"
-				state.reference_frame = 'world'  
+			state = LinkState()
+			state.link_name = "sole::sole_link"
+			state.reference_frame = 'world'  
 
-				# New sole position 
-				random_soles_position_x = random.uniform( -0.15, 0.10) 
-				random_soles_position_y = random.uniform( 0.4, 0.5) 
-				random_soles_position_z = random.uniform(0.01, 0.01)
+			# New sole position 
+			random_soles_position_x = random.uniform( -0.15, 0.10) 
+			random_soles_position_y = random.uniform( 0.4, 0.5) 
+			random_soles_position_z = random.uniform(0.01, 0.01)
 
-				# New sole orientation	
-				random_angle = random.uniform(0, 6.28)
-				my_quaternion =  R.from_euler('xyz',[0,0,random_angle]).as_quat()
-				my_quaternion = Quaternion(my_quaternion[0], my_quaternion[1], my_quaternion[2], my_quaternion[3])
+			# New sole orientation	
+			random_angle = random.uniform(0, 6.28)
+			my_quaternion =  R.from_euler('xyz',[0,0,random_angle]).as_quat()
 
-				# pose
-				state.pose.position.x = random_soles_position_x
-				state.pose.position.y = random_soles_position_y
-				state.pose.position.z = random_soles_position_z
-				state.pose.orientation.x = my_quaternion[0]
-				state.pose.orientation.y = my_quaternion[1]
-				state.pose.orientation.z = my_quaternion[2]
-				state.pose.orientation.w = my_quaternion[3]
-				
-				# twist
-				state.twist.linear.x = 0
-				state.twist.linear.y = 0
-				state.twist.linear.z = 0
-				state.twist.angular.x = 0
-				state.twist.angular.y = 0
-				state.twist.angular.z = 0
-				print(' NEW SOLE POSE:')
-				print(state.pose)
-				rospy.wait_for_service('/gazebo/set_link_state')
-				time.sleep(3.0)
-				try:
-					set_state = self.set_model_coordinates
-					result = set_state(state)
-					assert result.success is True
-				except rospy.ServiceException:
-					print("/gazebo/set_link_state service call failed") 
+			# pose
+			state.pose.position.x = random_soles_position_x
+			state.pose.position.y = random_soles_position_y
+			state.pose.position.z = random_soles_position_z
+			state.pose.orientation.x = my_quaternion[0]
+			state.pose.orientation.y = my_quaternion[1]
+			state.pose.orientation.z = my_quaternion[2]
+			state.pose.orientation.w = my_quaternion[3]
+			
+			# twist
+			state.twist.linear.x = 0
+			state.twist.linear.y = 0
+			state.twist.linear.z = 0
+			state.twist.angular.x = 0
+			state.twist.angular.y = 0
+			state.twist.angular.z = 0
+			print(' NEW SOLE POSE:')
+			print(state.pose)
+			rospy.wait_for_service('/gazebo/set_link_state')
+			time.sleep(3.0)
+			try:
+				set_state = self.set_model_coordinates
+				result = set_state(state)
+				assert result.success is True
+			except rospy.ServiceException:
+				print("/gazebo/set_link_state service call failed") 
 
 
 

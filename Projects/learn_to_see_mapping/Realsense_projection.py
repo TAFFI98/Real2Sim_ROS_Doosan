@@ -14,7 +14,7 @@ class Realsense_projection:
 
     # ---- Initialization of annotation and images paths ---- #
     self.img_path = img_path 
-    self.local_coord_path = local_coord_path # Annotation of burr position and tool orientation with respect to sole camera frame
+    self.local_coord_path = local_coord_path # Annotation of burr position and tool orientation with respect to sole frame
     self.global_coord_path = global_coord_path # Annotation of sole camera frame position and orientation with respect to global frame
     self.sole_stl_path = stl_sole_path
     self.deburring_tool_path ='/root/catkin_ws/src/doosan-robot/dsr_description/meshes/gripper/deburring_tool/deburring_tool.stl'
@@ -25,7 +25,7 @@ class Realsense_projection:
     # ---- Initialization of intrinsic and extrisic parameters of the camera ---- #
     self._intrinsics, self._extrinsics  = self.init_realsense_model(self.orientation_camera,self.position_camera)
 
-    # ----T': TCP orientaion in burr frame ---- #
+    # ----T': TCP orientation in burr frame ---- #
     self.T_prime = self.define_T_prime()
 
     # ---- T_tcp_tool: Tool pose in TCP frame  ---- #
