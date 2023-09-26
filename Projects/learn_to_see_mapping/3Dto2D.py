@@ -25,7 +25,7 @@ def main_Realsense(img_path, local_coord_path, global_coord_path, show_images , 
 
 if __name__ == '__main__':
     
-    for sole_number in range(20,21):
+    for sole_number in range(10,21):
         for index in range(0,4):
 
             # ----- Paths definition ----#

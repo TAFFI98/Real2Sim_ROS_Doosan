@@ -45,7 +45,7 @@ if __name__ == "__main__":
         # -------------------- Start episodes ------------------#
         print "\n\nStarting episodes..."
         time.sleep(1.0)
-        for episode in range (num_episodes):
+        for episode in range(num_episodes):
             time.sleep(0.1)
 
             # -------------------- RESET ENVIRONMENT ------------------#

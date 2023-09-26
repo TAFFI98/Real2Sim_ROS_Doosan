@@ -49,8 +49,6 @@ class MyRLEnvironmentNode():
             # --------------------  VIRTUAL ROBOT CONNECTION ------------------#
             self.ROBOT_ID = ROBOT_ID
             self.ROBOT_MODEL = ROBOT_MODEL
-            self.velx=[50, 50]
-            self.accx=[100, 100]
             self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
 
             # --------------------  TRANSFORMATION MATRICES ------------------#
@@ -223,25 +221,28 @@ class MyRLEnvironmentNode():
 
             return [w, x, y, z]
 
-
         def get_current_sole_pose(self):
-			rospy.wait_for_service('/gazebo/get_link_state')
-			# -------------------- Get current position of the sole------------------#
-			self.sole_coordinates = self.model_coordinates( "sole::sole_link" , "world" )
-			self.sole_z = self.sole_coordinates.link_state.pose.position.z
-			self.sole_y = self.sole_coordinates.link_state.pose.position.y
-			self.sole_x = self.sole_coordinates.link_state.pose.position.x
-			self.sole_ori_x = self.sole_coordinates.link_state.pose.orientation.x
-			self.sole_ori_y = self.sole_coordinates.link_state.pose.orientation.y
-			self.sole_ori_z = self.sole_coordinates.link_state.pose.orientation.z
-			self.sole_ori_w = self.sole_coordinates.link_state.pose.orientation.w
-			self.sole_position = [self.sole_x,self.sole_y,self.sole_z]
-			self.sole_orientation = [self.sole_ori_x,self.sole_ori_y,self.sole_ori_z,self.sole_ori_w]
+            '''
+            Function to get the current pose of the sole in the world
+            '''
+            rospy.wait_for_service('/gazebo/get_link_state')
+            self.sole_coordinates = self.model_coordinates( "sole::sole_link" , "world" )
+            self.sole_z = self.sole_coordinates.link_state.pose.position.z
+            self.sole_y = self.sole_coordinates.link_state.pose.position.y
+            self.sole_x = self.sole_coordinates.link_state.pose.position.x
+            self.sole_ori_x = self.sole_coordinates.link_state.pose.orientation.x
+            self.sole_ori_y = self.sole_coordinates.link_state.pose.orientation.y
+            self.sole_ori_z = self.sole_coordinates.link_state.pose.orientation.z
+            self.sole_ori_w = self.sole_coordinates.link_state.pose.orientation.w
+            self.sole_position = [self.sole_x,self.sole_y,self.sole_z]
+            self.sole_orientation = [self.sole_ori_x,self.sole_ori_y,self.sole_ori_z,self.sole_ori_w]
 
-			return self.sole_position , self.sole_orientation
+            return self.sole_position , self.sole_orientation
 
         def set_new_sole_position(self):
-            # -------------------- Set new position of the sole------------------#
+            '''
+            Function to set a new pose of the sole in the world
+            '''
             state = LinkState()
             state.link_name = "sole::sole_link"
             state.reference_frame = 'world'  
@@ -293,7 +294,6 @@ class MyRLEnvironmentNode():
             '''
             Transformation matrix from global to sole reference frame
             '''
-            # ---- Transformation matrix definition ---- #
             position_mm = np.multiply(np.expand_dims(np.asarray(sole_position),axis=0),np.array([[1000,1000,1000]], np.float32))
             position_m = np.expand_dims(np.asarray(sole_position),axis=0)
             rotation_matrix = self.quaternion_to_rotation_matrix(sole_orientation)
@@ -440,13 +440,13 @@ class MyRLEnvironmentNode():
             y = random.uniform(360, 510)	 
             z = random.uniform(10, 10)  
 
-            W = random.uniform(0, 0)	  # z-direction rotation of reference coordinate system
+            W = random.uniform(0, 0)	      # z-direction rotation of reference coordinate system
             P = random.uniform(180, 180)	  # y-direction rotation of w rotated coordinate system
-            R = random.uniform(0, 90)      # z-direction rotation of of w and p rotated coordinate system
+            R = random.uniform(0, 90)         # z-direction rotation of of w and p rotated coordinate system
 
             return posx(x,y,z,W,P,R)
 
-        def action_step_generate_trajectory(self, n_steps = 7):
+        def action_step_generate_trajectory(self, n_steps = 200):
             """
             Generate random TCP trajectory (sequaence of positions and orientations)
             """               
@@ -471,8 +471,8 @@ class MyRLEnvironmentNode():
             Reach a position of the trajectory with a movel. Used to execute the actual deburring trajectory.
             Args:
                 pos: Robot TCP position to be reached
-            """             
-            success = movel(pos, self.velx, self.accx)
+            """                         
+            success = movel(pos, [50, 50], [100, 100])
             return success
 
         def action_step_perform_trajectory(self, traj, coeff_reward = 1):
@@ -485,31 +485,31 @@ class MyRLEnvironmentNode():
             # ------ Real initial pose: Orientation as quaternion -----#
             initial_pose = traj[0]
             initial_position = initial_pose[0:3]
-            initial_orientation = R.from_euler('zyz', initial_pose[3:]).as_quat()
-            
-            initial_orientation_PYQ = Quaternion([initial_orientation[-1], initial_orientation[0], initial_orientation[1], initial_orientation[2]])
+            initial_orientation = R.from_euler('zyz', initial_pose[3:]).as_quat()                                                                     # scipy utilizes X,Y,Z,W convention
+            initial_orientation_PYQ = Quaternion([initial_orientation[-1], initial_orientation[0], initial_orientation[1], initial_orientation[2]])   # pyquaternion utilizes W,X,Y,Z convention
 
 
 
             # ------ Ground-truth initial pose -----#
             initial_position_true = self.global_TCP_poses_trajectory_mm[0,0:3,-1]
                     
-            initial_orientation_true_PYQ = Quaternion(matrix=self.global_TCP_poses_trajectory_mm[0,0:3,0:3]) # PYQUATERNION ASSUMES W,X,Y,Z
-            initial_orientation_true = np.array([initial_orientation_true_PYQ.x,initial_orientation_true_PYQ.y,initial_orientation_true_PYQ.z,initial_orientation_true_PYQ.w])
-
+            initial_orientation_true_PYQ = Quaternion(matrix=self.global_TCP_poses_trajectory_mm[0,0:3,0:3])                                                                   # pyquaternion utilizes W,X,Y,Z convention
+            initial_orientation_true = np.array([initial_orientation_true_PYQ.x,initial_orientation_true_PYQ.y,initial_orientation_true_PYQ.z,initial_orientation_true_PYQ.w]) # scipy utilizes X,Y,Z,W convention
             initial_pose_true = list(initial_position_true)+ list(R.from_quat(initial_orientation_true).as_euler('zyz',degrees=True))
 
             # -------------------- EXECUTE TRAJECTORY------------------#
             #success =  self.action_step_perform_position_movejx(initial_pose)
             success =  self.action_step_perform_position_movejx(posx(initial_pose_true))
             
+            # -------------------- GET TCP POSE------------------#
+            self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
             rospy.wait_for_message('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, timeout=5)
 
             print '\n\nStreamed initial position: ', initial_position 
             print 'Current TCP initial position:', self.current_TCP_pos[0:3] 
 
-            print 'Streamed initial orientation: ', R.from_quat(initial_orientation).as_quat()
-            print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()
+            print 'Streamed initial orientation: ', R.from_quat(initial_orientation).as_euler('zyz')
+            print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:]).as_euler('zyz')
 
             # -------------------- COMPUTE REWARD ------------------#
             # -------------------- streamed pose ------------------#
@@ -519,9 +519,8 @@ class MyRLEnvironmentNode():
 
             # -------------------- actual reached pose ------------------#
             reward_initial_position_actual = self.calculate_reward_position(self.current_TCP_pos[0:3],  initial_position_true)
-            reward_initial_orientation_actual = self.calculate_reward_orientation(Quaternion(R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()),  initial_orientation_true_PYQ)
+            reward_initial_orientation_actual = self.calculate_reward_orientation(Quaternion([R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[-1], R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[0], R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[1], R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[2]]),  initial_orientation_true_PYQ)
             reward_actual = reward_initial_position_actual + coeff_reward * reward_initial_orientation_actual
-
 
             print('Reward actual :', reward_actual, '   Reward stream :', reward_stream)
             # -------------------- DEFINE STATE SPACE ------------------#
@@ -533,25 +532,29 @@ class MyRLEnvironmentNode():
             for i,pose in enumerate(traj[1:]):
                 # ------  Real pose: Orientation as quaternion -----#
                 position = pose[0:3]
-                orientation = R.from_euler('zyz', pose[3:]).as_quat()
-                orientation_PYQ = Quaternion([orientation[-1], orientation[0], orientation[1], orientation[2]])
+                orientation = R.from_euler('zyz', pose[3:]).as_quat()                                            # scipy utilizes X,Y,Z,W convention
+                orientation_PYQ = Quaternion([orientation[-1], orientation[0], orientation[1], orientation[2]])  # pyquaternion utilizes W,X,Y,Z convention
 
                 #  ------ Ground-truth pose -----#
                 position_true = self.global_TCP_poses_trajectory_mm[i,0:3,-1]
-                orientation_true_PYQ = Quaternion(matrix=self.global_TCP_poses_trajectory_mm[i,0:3,0:3]) # PYQUATERNION ASSUMES W,X,Y,Z
-                orientation_true =  np.array([orientation_true_PYQ.x,orientation_true_PYQ.y,orientation_true_PYQ.z,orientation_true_PYQ.w])
+                orientation_true_PYQ = Quaternion(matrix=self.global_TCP_poses_trajectory_mm[i,0:3,0:3])                                    # pyquaternion utilizes W,X,Y,Z convention
+                orientation_true =  np.array([orientation_true_PYQ.x,orientation_true_PYQ.y,orientation_true_PYQ.z,orientation_true_PYQ.w]) # scipy utilizes X,Y,Z,W convention
                 pose_true = list(position_true)+ list(R.from_quat(orientation_true).as_euler('zyz',degrees=True))
 
                 # -------------------- EXECUTE TRAJECTORY------------------#
                 #success =  self.action_step_perform_position_moveL(pose)
-                success =  self.action_step_perform_position_movejx(posx(pose_true))
+                success =  self.action_step_perform_position_moveL(posx(pose_true))
 
+            
+                # -------------------- GET TCP POSE------------------#
+                self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
                 rospy.wait_for_message('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, timeout=5)
+
                 print '\n\nStreamed  position: ', position
                 print 'Current TCP  position:', self.current_TCP_pos[0:3] 
 
-                print 'Streamed initial orientation: ', R.from_quat(orientation).as_quat()
-                print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()
+                print 'Streamed initial orientation: ', R.from_quat(orientation).as_euler('zyz')
+                print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:]).as_euler('zyz')
 
                 # -------------------- COMPUTE REWARD ------------------#
 
@@ -562,7 +565,7 @@ class MyRLEnvironmentNode():
 
                 # -------------------- actual reached pose ------------------#
                 reward_position_actual = self.calculate_reward_position(self.current_TCP_pos[0:3],  initial_position_true)
-                reward_orientation_actual = self.calculate_reward_orientation(Quaternion(R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()),  orientation_true_PYQ)
+                reward_orientation_actual = self.calculate_reward_orientation(Quaternion([R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[-1], R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[0], R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[1], R.from_euler('zyz', self.current_TCP_pos[3:]).as_quat()[2]]),  orientation_true_PYQ)
                 reward_actual = reward_actual + reward_position_actual + coeff_reward * reward_orientation_actual
 
                 print('Reward actual :', reward_actual, '   Reward stream :', reward_stream)

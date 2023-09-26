@@ -53,7 +53,7 @@ def main(folder_dataset, sole_name):
 if __name__ == '__main__':
 	# Define folder for dataset storage
 	folder_dataset = '/root/catkin_ws/dataset_learn_to_see/'
-	sole_name = 'sole_20'
+	sole_name = 'sole_10'
 
 	main(folder_dataset, sole_name)
 
