@@ -85,8 +85,8 @@ class LearnToSeeNode():
 			state.reference_frame = 'world'  
 
 			# New sole position 
-			random_soles_position_x = random.uniform( -0.15, 0.10) 
-			random_soles_position_y = random.uniform( 0.4, 0.5) 
+			random_soles_position_x = random.uniform( -0.04, 0.05) 
+			random_soles_position_y = random.uniform( 0.53, 0.6) 
 			random_soles_position_z = random.uniform(0.01, 0.01)
 
 			# New sole orientation	

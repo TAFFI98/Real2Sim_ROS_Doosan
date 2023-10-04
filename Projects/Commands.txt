@@ -24,12 +24,17 @@ conda activate myenv
 python /root/catkin_ws/learn_to_see_mapping/3Dto2D.py
 
 
+# ------------- GAN   --------------- #
+
+conda env create -f /root/catkin_ws/learn_to_see_gan/environment.yml
+conda activate myenv_gan
+python /root/catkin_ws/learn_to_see_gan/GAN_decoder.py
+
 # ---------- Create conda env for burrs local position annotation  ------------ #          
 
 conda env create -f /root/catkin_ws/Random_soles_dataset/environment_PY3.yml
 conda activate R2S_annotations_stl
 python /root/catkin_ws/Random_soles_dataset/spline_fit.py
-
 
 
 

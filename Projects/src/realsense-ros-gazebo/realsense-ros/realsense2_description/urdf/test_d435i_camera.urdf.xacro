@@ -15,6 +15,6 @@
     <child link="base_link"/>
 </joint>
   <xacro:sensor_d435i name="$(arg name)" topics_ns="$(arg topics_ns)" parent="base_link" use_nominal_extrinsics="$(arg use_nominal_extrinsics)" publish_pointcloud="$(arg publish_pointcloud)" add_plug="$(arg add_plug)">
-    <origin xyz="0 0.5 0.5" rpy="0 1.57 1.57"/>
+    <origin xyz="0 0.544 0.303" rpy="0 1.57 1.57"/>
   </xacro:sensor_d435i>
 </robot>

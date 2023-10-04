@@ -33,6 +33,8 @@ if __name__ == "__main__":
     
     ''' TCP CONFIGURATION: deburring tool'''
     get_tcp = rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+ '/tcp/get_current_tcp', GetCurrentTcp)
+    p1 = [0,0,0,0,0,0] #mm/deg
+    add_tcp("flange", p1)
     p0 = [-10,8,166,0,0,140.948] #mm/deg
     add_tcp("tcp", p0)
     set_tcp("tcp")

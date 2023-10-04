@@ -81,7 +81,7 @@ class Realsense_projection:
       Define camera optical frame with respect to the global one
       """
       self.orientation_camera  = R.from_euler("xyz", [-180 , 0, 0 ] , degrees=True)
-      self.position_camera = [-0.017,0.513, 0.489]
+      self.position_camera = [-0.017, 0.557, 0.292]
       camera_rotation_matrix = self.orientation_camera.as_matrix()    
 
       if mm == True:

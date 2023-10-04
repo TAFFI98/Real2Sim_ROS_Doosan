@@ -101,7 +101,7 @@ class MyRLEnvironmentNode():
             Define camera optical frame with respect to the global one
             """
             self.orientation_camera  = R.from_euler("xyz", [-180 , 0, 0 ] , degrees=True)
-            self.position_camera = [-0.017,0.513, 0.489]
+            self.position_camera = [-0.017, 0.557, 0.292]
             camera_rotation_matrix = self.quaternion_to_rotation_matrix(self.orientation_camera.as_quat())   
 
             if mm == True:
@@ -138,15 +138,13 @@ class MyRLEnvironmentNode():
         def define_T_prime(self):
             """
             Define TCP pose in burr ref frame
-            """  
-            tcp_translation = np.array([[0, 0, 0]])      
-            tcp_rotation =  self.quaternion_to_rotation_matrix(R.from_euler('XYZ', [ 180 , 0, -135], degrees=True).as_quat())
-
+            """
+            tcp_translation = np.array([[0, 0, 0]])
+            tcp_rotation =  self.quaternion_to_rotation_matrix(R.from_euler('XYZ', [ 180 , 0, 225], degrees=True).as_quat())
             # ---- Transformation matrix definition ---- #
             upper_matrix = np.concatenate((tcp_rotation, tcp_translation.T), axis=1)
             lower_matrix = np.array([[0,0,0,1]])
             transformation_matrix = np.concatenate((upper_matrix, lower_matrix), axis=0)
-
             return transformation_matrix
 		
         def image_callback(self, image_msg):
@@ -248,8 +246,8 @@ class MyRLEnvironmentNode():
             state.reference_frame = 'world'  
 
             # New sole position 
-            random_soles_position_x = random.uniform( -0.15, 0.10) 
-            random_soles_position_y = random.uniform( 0.4, 0.5) 
+            random_soles_position_x = random.uniform( -0.04, 0.05) 
+            random_soles_position_y = random.uniform( 0.53, 0.6) 
             random_soles_position_z = random.uniform(0.01, 0.01)
 
             # New sole orientation	
@@ -284,11 +282,13 @@ class MyRLEnvironmentNode():
                 print("/gazebo/set_link_state service call failed") 
 
         def reset_robot_pose(self):
-            """
-            Resets the Robot pose to HOME position: q0
-            """ 
-            q0 = posj(0,0,0,0,0,0)
-            movej(q0, vel=60, acc=30)
+                    """
+                    Resets the Robot pose to HOME position: q0
+                    """
+                    set_tcp("flange")
+                    q0 = posx(-0.6, 454.6, 347.9, 82.9, -180.0, -97.2)
+                    movejx(q0, vel=60, acc=30, sol= 6) 
+                    set_tcp("tcp")
 
         def define_T_sole(self, sole_position, sole_orientation, mm):
             '''
@@ -458,11 +458,11 @@ class MyRLEnvironmentNode():
 
         def action_step_perform_position_movejx(self, pos):
             """
-            Reach a position of the trajectory with a movejx. Used to reach the first position of the deburring trajectory.             
+            Reach a position of the trajectory with a movejx. Used to reach the first position of the deburring trajectory.          
             Args:
                 pos: Robot TCP position to be reached
-            """             
-            success = movejx(pos, vel=60, acc=60, sol=2)
+            """          
+            success = movejx(pos, vel=60, acc=60, sol= 6)
             print '\n\nInitial position reached'
             return success
 
@@ -505,11 +505,11 @@ class MyRLEnvironmentNode():
             self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
             rospy.wait_for_message('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, timeout=5)
 
-            print '\n\nStreamed initial position: ', initial_position 
+            print '\n\nStreamed initial position: ', initial_position_true
             print 'Current TCP initial position:', self.current_TCP_pos[0:3] 
 
-            print 'Streamed initial orientation: ', R.from_quat(initial_orientation).as_euler('zyz')
-            print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:]).as_euler('zyz')
+            print 'Streamed initial orientation: ', R.from_quat(initial_orientation_true).as_euler('zyz')
+            print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:],degrees=True).as_euler('zyz')
 
             # -------------------- COMPUTE REWARD ------------------#
             # -------------------- streamed pose ------------------#
@@ -550,11 +550,11 @@ class MyRLEnvironmentNode():
                 self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
                 rospy.wait_for_message('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, timeout=5)
 
-                print '\n\nStreamed  position: ', position
+                print '\n\nStreamed  position: ', position_true
                 print 'Current TCP  position:', self.current_TCP_pos[0:3] 
 
-                print 'Streamed initial orientation: ', R.from_quat(orientation).as_euler('zyz')
-                print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:]).as_euler('zyz')
+                print 'Streamed initial orientation: ', R.from_quat(orientation_true).as_euler('zyz')
+                print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:],degrees=True).as_euler('zyz')
 
                 # -------------------- COMPUTE REWARD ------------------#
 
