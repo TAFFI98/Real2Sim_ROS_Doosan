@@ -1,26 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/ python3
+import sys
+import os
 import cv2
 import numpy as np
 import rospy
 import threading
 import time
 import random
-import sys
-import os
+
 import pickle
 sys.dont_write_bytecode = True
-sys.path.append( os.path.abspath(os.path.join("/root/catkin_ws/src/doosan-robot/common/imp")) ) # get import path : DSR_ROBOT.py 
+sys.path.append( os.path.abspath(os.path.join("/root/catkin_ws/src/doosan-robot/common/imp"))) # get import path : DSR_ROBOT.py 
 from DSR_ROBOT import *
 
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
-
+#from cv_bridge import CvBridge, CvBridgeError
+import ros_numpy
 from gazebo_msgs.srv import GetLinkState ,SetLinkState
 from gazebo_msgs.msg import ModelState, LinkState
 
 from scipy.spatial.transform import Rotation as R
-import tf.transformations as tr
 
 import pyrealsense2 as tf
 from pyquaternion import Quaternion
@@ -34,7 +34,7 @@ class MyRLEnvironmentNode():
 
 			# -------------------- IMAGE SUBSCRIBER  ------------------#
             self.suscriber_image = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)
-            self.bridge = CvBridge()	
+            #self.bridge = CvBridge()	
 
             # -------------------- CLIENT TO GET THE SOLE POSITION IN GAZEBO ------------------#
             self.sole_n = sole_number
@@ -149,13 +149,9 @@ class MyRLEnvironmentNode():
 		
         def image_callback(self, image_msg):
 			# -------------------- Read image------------------#
-			try:
-				self.cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
-				#print("Image received")
-			except CvBridgeError as e:
-				rospy.logerr(e)
-				return
-			image_height, image_width, _ = self.cv_image.shape
+
+            self.cv_image = ros_numpy.numpify(image_msg) 
+
 
         def msgRobotState_cb(self, msg):
             """
@@ -463,7 +459,7 @@ class MyRLEnvironmentNode():
                 pos: Robot TCP position to be reached
             """          
             success = movejx(pos, vel=60, acc=60, sol= 6)
-            print '\n\nInitial position reached'
+            print('\n\nInitial position reached')
             return success
 
         def action_step_perform_position_moveL(self, pos):
@@ -505,11 +501,11 @@ class MyRLEnvironmentNode():
             self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
             rospy.wait_for_message('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, timeout=5)
 
-            print '\n\nStreamed initial position: ', initial_position_true
-            print 'Current TCP initial position:', self.current_TCP_pos[0:3] 
+            print('\n\nStreamed initial position: ', initial_position_true)
+            print('Current TCP initial position:', self.current_TCP_pos[0:3])
 
-            print 'Streamed initial orientation: ', R.from_quat(initial_orientation_true).as_euler('zyz')
-            print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:],degrees=True).as_euler('zyz')
+            print('Streamed initial orientation: ', R.from_quat(initial_orientation_true).as_euler('zyz'))
+            print('Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:],degrees=True).as_euler('zyz'))
 
             # -------------------- COMPUTE REWARD ------------------#
             # -------------------- streamed pose ------------------#
@@ -525,10 +521,10 @@ class MyRLEnvironmentNode():
             print('Reward actual :', reward_actual, '   Reward stream :', reward_stream)
             # -------------------- DEFINE STATE SPACE ------------------#
             s  = self.define_state_space()
-            print'\n\nState space :', s
+            print('\n\nState space :', s)
             
 
-            print '\n\nTrajectory started..'            
+            print('\n\nTrajectory started..')            
             for i,pose in enumerate(traj[1:]):
                 # ------  Real pose: Orientation as quaternion -----#
                 position = pose[0:3]
@@ -550,11 +546,11 @@ class MyRLEnvironmentNode():
                 self.model_state = rospy.Subscriber('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, self.msgRobotState_cb )
                 rospy.wait_for_message('/'+self.ROBOT_ID +self.ROBOT_MODEL+'/state', RobotState, timeout=5)
 
-                print '\n\nStreamed  position: ', position_true
-                print 'Current TCP  position:', self.current_TCP_pos[0:3] 
+                print('\n\nStreamed  position: ', position_true)
+                print('Current TCP  position:', self.current_TCP_pos[0:3] )
 
-                print 'Streamed initial orientation: ', R.from_quat(orientation_true).as_euler('zyz')
-                print 'Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:],degrees=True).as_euler('zyz')
+                print('Streamed initial orientation: ', R.from_quat(orientation_true).as_euler('zyz'))
+                print('Current TCP initial orientation:', R.from_euler('zyz', self.current_TCP_pos[3:],degrees=True).as_euler('zyz'))
 
                 # -------------------- COMPUTE REWARD ------------------#
 
@@ -572,9 +568,9 @@ class MyRLEnvironmentNode():
 
                 # -------------------- DEFINE STATE SPACE ------------------#
                 s  = self.define_state_space()
-                print'\n\nState space :', s
+                print('\n\nState space :', s)
             
-            print '\n\nTrajectory executed.. ' 
+            print('\n\nTrajectory executed.. ')
             print('FINAL Reward actual :', reward_actual, '   FINAL Reward stream :', reward_stream)
 
         def calculate_reward_position(self, point1, point2):

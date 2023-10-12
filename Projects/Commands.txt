@@ -15,7 +15,7 @@ rosrun learn_to_see run_learn_to_see.py
 
 # ------------- RL ENVIRONMENT --------------- #
 rosrun RL_environment run_environment.py
-
+python3 /root/catkin_ws/src/RL_environment/scripts/run_environment.py
 
 # ------------- Create conda env for 3D to 2D Transformation   --------------- #
 
@@ -92,3 +92,18 @@ rosservice call /dsr01/tcp/set_current_tcp tcp
 
 # READ THE STATE OF THE CURRENT SET TCP
 rostopic echo /dsr01a0509/state
+
+
+# ------------------PYTHON3 -----------#
+#!/usr/bin/ python3
+
+
+cd ~/catkin_ws
+source ./devel/setup.bash
+roslaunch dsr_launcher single_robot_rviz_gazebo_moveit_sole.launch model:=a0509  color:=blue gripper:=deburring_tool mode:=virtual sole:=true sole_n:=10
+
+
+cd ~/catkin_ws
+source ./devel/setup.bash
+python3 /root/catkin_ws/src/RL_environment/scripts/run_environment.py
+

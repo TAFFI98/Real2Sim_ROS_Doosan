@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-import cv2
+#!/usr/bin/ python3
 import rospy
 import os
 import threading, time
@@ -19,6 +18,11 @@ from RL_class import MyRLEnvironmentNode
 
 from sensor_msgs.msg import Image
 
+import tensorflow as tf
+print('tf version: ', tf.__version__)
+
+import torch
+print('torch version: ',torch.__version__)
 
 ''' SOLE N CONFIGUARTION '''
 sole_n = 10
@@ -45,7 +49,7 @@ if __name__ == "__main__":
         num_episodes = 3
         
         # -------------------- Start episodes ------------------#
-        print "\n\nStarting episodes..."
+        print("\n\nStarting episodes...")
         time.sleep(1.0)
         for episode in range(num_episodes):
             time.sleep(0.1)
@@ -53,19 +57,12 @@ if __name__ == "__main__":
             # -------------------- RESET ENVIRONMENT ------------------#
             RL_node.reset_evironment()
             time.sleep(0.5)
-            print '\n\nEpisode %s started: Environment reset'% (episode+1)
+            print(f'\n\nEpisode {episode+1} started: Environment reset')
 
             # -------------------- REALSENSE ACQUISITION ------------------# 
             rospy.wait_for_message('/camera/color/image_raw', Image, timeout=5)
             projected_image,decoder_img = RL_node.project_to_image()
             
-            # -------------------- SHOW IMAGES ------------------# 
-
-            # cv2.imshow('Projected image',projected_image)
-            # cv2.waitKey(0)
-            # cv2.imshow('Decoder image',decoder_img)
-            # cv2.waitKey(0)
-
 
 			# -------------------- GENERATE ACTION: TRAJECTORY ------------------#
             action = RL_node.action_step_generate_trajectory()
@@ -75,9 +72,9 @@ if __name__ == "__main__":
             
             time.sleep(1.0)
 
-            print '\n\nEpisode %s Ended'% (episode+1)
+            print(f'\n\nEpisode {episode+1} Ended')
 
         # -------------------- End of episodes ------------------#
         rospy.signal_shutdown("EPISODES ENDED")	
        
-	print ("Total num of episodes completed, Exiting ....")
+	#print("Total num of episodes completed, Exiting ....")

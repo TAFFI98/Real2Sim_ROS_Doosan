@@ -30,8 +30,27 @@ WORKDIR /root/catkin_ws/src
 RUN rosdep install --from-paths doosan-robot --ignore-src --rosdistro melodic -r -y
 WORKDIR /root/catkin_ws/
 RUN rosdep install --from-paths src --ignore-src --rosdistro melodic
-RUN sudo apt install python-pip -y
-RUN pip install pyquaternion pathlib scipy pyrealsense2
+RUN sudo apt update -y\
+	&& sudo apt install -y software-properties-common \
+	&& sudo add-apt-repository ppa:deadsnakes/ppa \
+	&& sudo apt update \
+	&& sudo apt install -y python3.8 \
+	&& sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 \
+	&& sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2 \
+	&& sudo apt install -y python3.8-distutils \
+	&& wget https://bootstrap.pypa.io/get-pip.py \
+	&& sudo python3.8 get-pip.py 
+
+RUN pip3.8 install rospkg \
+	&& pip3.8 install opencv-python \
+	&& pip3.8 install pyquaternion rosnumpy \
+	&& pip3.8 install "numpy<1.24"  \
+	&& pip3.8 install scipy \
+	&& pip3.8 install pyrealsense2 \
+	&& pip3.8 install tensorflow \
+	&& pip3.8 install torch torchvision torchaudio
+
+
 # add environment setup 
 RUN echo 'source /opt/ros/melodic/setup.bash' >> /root/.bashrc
  
