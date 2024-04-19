@@ -13,7 +13,7 @@ if there are problems with the shared drive, you can download:
 - sim_dataset: Colab_Notebooks/20k_dataset_v8.tar
 - real_dataset: Colab_Notebooks/500_dataset_real_v8.tar
 
-### tfrecord data DATASET (used then for trining in pix2pix code): drive or from the Datasets release
+### tfrecord data DATASET (used then for training in pix2pix code): drive or from the Datasets release
 
 ### TRAIN SETTINGS:
 - sim train settings: dataset=sim_dataset, gamma=0.5, lambda=500, resol=512x512, total=120k epochs (steps=20000)
