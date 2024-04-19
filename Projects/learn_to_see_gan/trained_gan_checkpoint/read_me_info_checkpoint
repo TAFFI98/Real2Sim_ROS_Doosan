@@ -1,0 +1,2 @@
+checkpoints obtained with pix2pix_8.0.ipynb with 20k dataset of sim img (20k_dataset_v8.tar). 
+Generator loss gamma=0.5, LAMBDA=500, and 120k iterations. [img resolution 512x512]
