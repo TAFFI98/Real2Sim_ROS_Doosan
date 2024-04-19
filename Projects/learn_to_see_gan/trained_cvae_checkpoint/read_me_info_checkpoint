@@ -1,4 +1,0 @@
-checkpoints data: Colab_Notebooks/v8_extra/checkpoints_cvae/ckpt_cvae_latent50_diff_net12' 
-script: cvae_burr_to_contour.ipynb
-20500 dataset from 20000 processed cgan sim images and 500 processed real images . 
-latent=50, 6 epochs on the dataset. [img resolution 240x320]
