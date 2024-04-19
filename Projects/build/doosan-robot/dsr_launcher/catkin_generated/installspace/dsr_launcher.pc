@@ -1,8 +1,0 @@
-prefix=/root/catkin_ws/install
-
-Name: dsr_launcher
-Description: Description of dsr_launcher
-Version: 1.2.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

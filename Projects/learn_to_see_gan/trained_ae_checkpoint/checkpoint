@@ -1,2 +1,0 @@
-model_checkpoint_path: "ckpt_cvae_epoch6"
-all_model_checkpoint_paths: "ckpt_cvae_epoch6"
