@@ -10,7 +10,7 @@ if there are problems with the shared drive, you can download:
 - CVAE code: Colab_Notebooks/v9_final/cvae_burr_to_contour.ipynb (just if you wnat to see another implentation)
 
 
-### tfrecord data DATASET (used then for trining in pix2pix code): in folder Learn To See/datasets
+### tfrecord data DATASET (used then for training in pix2pix code): in folder Learn To See/datasets
 
 ### AE TRAIN SETTINGS:
 - checkpoints data: Colab_Notebooks/v8_extra/checkpoints_cae/ckpt_cae_flatten' 
