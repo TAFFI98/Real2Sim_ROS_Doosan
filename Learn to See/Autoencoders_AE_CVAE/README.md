@@ -1,13 +1,13 @@
 ## HOW TO RETRIEVE DATA:
 In the drive: https://drive.google.com/drive/folders/19M08ITTCRv6AHOMG6eogdmJWtK5i4vYy?usp=sharing
 - if there are problems with the shared drive, you can download:
-        - the tfrecord data datasets from the Datasets Github release
-        - the model checkpoint can be retrieve from the Docker branch of this repo in /Projects/Learn To See (both for the sim and real images and for the gan and autoencoders)
+        - the tfrecord data datasets from the latest Github release of this project
+        - the model checkpoints can be retrieve from the Docker branch of this repo in /Projects/Learn To See (both for the sim and real images and for the gan and autoencoders)
         - Put this in your desired drive and properly load them in the scripts
         
 ### CODE:
-- AE code: Colab_Notebooks/v9_final/ae_burr_to_contour.ipynb (THE ONE USED IN THE END)
-- CVAE code: Colab_Notebooks/v9_final/cvae_burr_to_contour.ipynb (just if you wnat to see another implentation)
+- AE code: Colab_Notebooks/v9_final/ae_burr_to_contour.ipynb (THE ONE USED)
+- CVAE code: Colab_Notebooks/v9_final/cvae_burr_to_contour.ipynb (just if you want to see another implentation)
 
 
 ### tfrecord data DATASET (used then for training in pix2pix code): in folder Learn To See/datasets
