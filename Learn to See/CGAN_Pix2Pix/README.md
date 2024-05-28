@@ -1,8 +1,8 @@
 ## HOW TO RETRIEVE DATA:
 in the drive: https://drive.google.com/drive/folders/19M08ITTCRv6AHOMG6eogdmJWtK5i4vYy?usp=sharing
 if there are problems with the shared drive, you can download:
-        - the tfrecord data datasets from the Datasets release
-        - the model checkpoint can be retrieve from the Docker branch of this repo (or in the docker folder if you downloaded) in /Projects/Learn To See (both for the sim and real images and for the gan and autoencoders)
+        - the tfrecord data datasets from the latest Github release of this project
+        - the model checkpoints can be retrieve from the Docker branch of this repo (or in the docker folder if you downloaded) in /Projects/Learn To See (both for the sim and real images and for the gan and autoencoders)
         So you can put this in your desired drive and properly load them in the scripts
         
 ### CODE:
