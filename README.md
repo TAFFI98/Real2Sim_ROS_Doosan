@@ -1,6 +1,8 @@
 # Thesis: 
 ### Bridging the Sim-to-Real Gap: Self-Supervised Trajectory Planning via Visual Perception for Robotic Deburring
 # Paper: 
+Tafuro, A., Molinaro, M., Zanchettin, A.M. et al. Self-supervised Vision-driven Trajectory Planning for Intelligent Robotic Deburring. Mach. Intell. Res. 22, 655–676 (2025). https://doi.org/10.1007/s11633-025-1560-6
+
 [PAPER](https://link.springer.com/article/10.1007/s11633-025-1560-6)
 
 |         |                   |
