@@ -1,5 +1,7 @@
 # Thesis: 
 ### Bridging the Sim-to-Real Gap: Self-Supervised Trajectory Planning via Visual Perception for Robotic Deburring
+# Paper: 
+[PAPER](https://link.springer.com/article/10.1007/s11633-025-1560-6)
 
 |         |                   |
 |-----------------|------------------------|
